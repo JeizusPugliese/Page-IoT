@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Control IoT | Admin</title>
+    <link href="css/prueba.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="dashboard admin-dashboard">
+    <!-- Barra de navegación superior -->
+    <header class="dashboard-header">
+        <div class="header-container">
+            <div class="header-title">
+                <h1>Info<span>IoT</span> | <small>Administrador</small></h1>
+            </div>
+
+      <!-- Menú -->
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <!-- Menú para ADMIN -->
+          <li class="admin-only" id="navInicioAdmin"><a href="principal_admin.html"><i class="fas fa-home"></i><span>Inicio</span></a></li>
+          <li class="admin-only" id="navControlAdmin"><a href="control_admin.html"><i class="fas fa-tachometer-alt"></i><span>Control</span></a></li>
+          <li class="admin-only" id="navIOTAdmin"><a href="iot_admin.html"><i class="fas fa-broadcast-tower"></i><span>IoT</span></a></li>
+          <li class="admin-only" id="navTablero"><a href="tablero.html"><i class="fas fa-chart-line"></i><span>Tablero</span></a></li>
+          <li class="admin-only" id="navUsuarios"><a href="usuarios.html"><i class="fas fa-users-cog"></i><span>Usuarios</span></a></li>
+          <li class="admin-only" id="navReportesAdmin"><a href="reportes_admin.html" class="active"><i class="fas fa-file-alt"></i><span>Reportes</span></a></li>
+        </ul>
+      </nav>
+
+            <!-- Info de usuario -->
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="welcome-msg" id="greetingMessage">Bienvenido</span>
+                    <span class="username" id="usernameDisplay">Cargando..</span>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user-shield" id="userIcon"></i>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="dashboard-content">
+        <!-- Sección Hero -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h2 id="heroGreeting">Panel <span class="highlight">Administrativo</span></h2>
+                <p class="hero-text">Control centralizado de usuarios, sensores y reportes del sistema IoT</p>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <span class="stat-value" id="totalUsers">0</span>
+                            <span class="stat-label">Usuarios Registrados</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-microchip"></i>
+                        <div>
+                            <span class="stat-value" id="totalSensors">0</span>
+                            <span class="stat-label">Sensores Activos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-file-alt"></i>
+                        <div>
+                            <span class="stat-value" id="totalReports">0</span>
+                            <span class="stat-label">Reportes Generados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Acciones rápidas de admin -->
+        <section class="admin-actions">
+            <h3 class="section-title"><span>Acciones Rápidas</span></h3>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-user-plus"></i></div>
+                    <h4>Gestión de Usuarios</h4>
+                    <p>Crear, editar y eliminar cuentas de usuarios.</p>
+                    <a href="usuarios.html" class="feature-btn">Ir a Usuarios</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-plug"></i></div>
+                    <h4>Monitoreo de Sensores</h4>
+                    <p>Supervisar y controlar dispositivos IoT conectados.</p>
+                    <a href="control_admin.html" class="feature-btn">Ir a Control</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>Estadísticas</h4>
+                    <p>Acceso al tablero con métricas globales del sistema.</p>
+                    <a href="tablero.html" class="feature-btn">Ver Tablero</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-file-download"></i></div>
+                    <h4>Generar Reportes</h4>
+                    <p>Exportar información filtrada en formato PDF.</p>
+                    <a href="reportes_admin.html" class="feature-btn">Generar Reporte</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Actividad reciente -->
+        <section class="recent-activity">
+            <h3 class="section-title"><span>Actividad Reciente</span></h3>
+            <div class="activity-list" id="activityList">
+                <p class="placeholder">Cargando actividad reciente...</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Chatbot -->
+    <a class="btn-whats pulse" href="https://wa.me/573052566649?text=Hola%20soy%20tu%20asistente%20de%20IoT">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/usuarios.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/Principal.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>Reportes</title>
+
+  <!-- CSS -->
+  <link href="css/prueba.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+  <!-- Agrego estilos de DataTables Material Design y Chart.js -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.material.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.min.css">
+</head>
+<body class="reports-page">
+  <!-- Barra de navegación superior -->
+  <header class="dashboard-header">
+    <div class="header-container">
+      <div class="header-title">
+        <h1>Reporte<span>IoT</span></h1>
+      </div>
+
+      <!-- Menú -->
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <!-- Menú para ADMIN -->
+          <li class="admin-only" id="navInicioAdmin"><a href="principal_admin.html"><i class="fas fa-home"></i><span>Inicio</span></a></li>
+          <li class="admin-only" id="navControlAdmin"><a href="control_admin.html"><i class="fas fa-tachometer-alt"></i><span>Control</span></a></li>
+          <li class="admin-only" id="navIOTAdmin"><a href="iot_admin.html"><i class="fas fa-broadcast-tower"></i><span>IoT</span></a></li>
+          <li class="admin-only" id="navTablero"><a href="tablero.html"><i class="fas fa-chart-line"></i><span>Tablero</span></a></li>
+          <li class="admin-only" id="navUsuarios"><a href="usuarios.html"><i class="fas fa-users-cog"></i><span>Usuarios</span></a></li>
+          <li class="admin-only" id="navReportesAdmin"><a href="reportes_admin.html" class="active"><i class="fas fa-file-alt"></i><span>Reportes</span></a></li>
+
+        </ul>
+      </nav>
+
+      <!-- Usuario -->
+      <div class="user-menu">
+        <div class="user-info">
+          <span class="welcome-msg">Bienvenido</span>
+          <span class="username" id="usernameDisplay">Cargando..</span>
+        </div>
+        <div class="user-avatar" id="userAvatar">
+          <i class="fas fa-user-circle" id="userIcon"></i>
+        </div>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido -->
+  <main>
+    <!-- Tarjetas de estadísticas rápidas -->
+    <section class="stats-cards" style="display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem;">
+      <div class="stat-card">
+        <i class="fas fa-database"></i>
+        <div>
+          <span class="stat-value" id="totalRegistros">0</span>
+          <span class="stat-label-rep">Registros encontrados</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-microchip"></i>
+        <div>
+          <span class="stat-value" id="totalSensores">0</span>
+          <span class="stat-label-rep">Sensores distintos</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-calendar-alt"></i>
+        <div>
+          <span class="stat-value" id="rangoFechas">-</span>
+          <span class="stat-label-rep">Rango de fechas</span>
+        </div>
+      </div>
+    </section>
+    <!-- Resumen de filtros aplicados -->
+    <section id="resumenFiltros" style="margin-bottom:1rem;text-align:center;display:none;"></section>
+    <!-- Gráfico de tendencias -->
+    <section id="graficoTendencias" style="max-width:900px;margin:0 auto 2rem auto;display:none;">
+      <canvas id="chartTendencias"></canvas>
+    </section>
+
+    <section class="feature-wrapper">
+      <div class="feature-card">
+        <h2 class="section-title"><span>Consultar Reportes de Sensores</span></h2>
+        <form id="formReporte" class="export-options">
+          <div class="form-group">
+            <label for="fechaInicio" class="form-label">Fecha de Inicio</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+              <input type="date" id="fechaInicio" class="form-control datepicker" required>
+            </div>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="fechaFin" class="form-label">Fecha Límite</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+              <input type="date" id="fechaFin" class="form-control datepicker" required>
+            </div>
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="nombreSensor" class="form-label">Nombre del Sensor</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-microchip"></i></span>
+              <select id="nombreSensor" class="form-select" required>
+                <option value="" disabled selected>Selecciona un sensor</option>
+                <option value="DHT11_T">Temperatura (DHT11_T)</option>
+                <option value="MQ7">Gas (MQ7)</option>
+                <option value="PIR">Movimiento (PIR)</option>
+                <option value="HC_SR04">Distancia (HC_SR04)</option>
+                <option value="LDR">Luz (LDR)</option>
+                <option value="DHT11_H">Humedad (DHT11_H)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group mt-4 text-center d-flex justify-content-center gap-2">
+            <button type="submit" class="btn custom-btn-primary compact-btn">
+              <i class="fas fa-search me-1"></i> Consultar
+            </button>
+            <button type="button" id="consultarTodos" class="btn custom-btn-outline compact-btn">
+              <i class="fas fa-list me-1"></i> Consultar Todos
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal fade" id="resultadosModal" tabindex="-1" aria-labelledby="resultadosModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="resultadosModalLabel">Resultados del Sensor</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-striped" id="tablaResultados">
+              <thead>
+                <tr>
+                  <th>Sensor</th>
+                  <th>Valor</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button class="btn btn-primary" id="descargarPDF">Descargar PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Chatbot -->
+  <div class="chatbot-container">
+    <button class="chatbot-toggle" id="chatbot-button"><i class="fas fa-robot"></i></button>
+    <div class="chatbot-window" id="chatbot-window">
+      <div class="chatbot-header">
+        <h3>Asistente IoT</h3>
+        <button class="close-chatbot"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="chatbot-messages" id="chatbot-body"></div>
+      <div class="chatbot-input">
+        <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
+        <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.material.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui/material-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.7/axios.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script src="js/scripts.js"></script>
+  <script src="js/reporte.js"></script>
+  <script src="js/usuarios.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>

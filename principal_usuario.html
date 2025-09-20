@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Control IoT | Usuario</title>
+    <link href="css/prueba.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="dashboard user-dashboard">
+    <!-- Barra de navegación superior -->
+    <header class="dashboard-header">
+        <div class="header-container">
+            <div class="header-title">
+                <h1>Info<span>IoT</span> | <small>Usuario</small></h1>
+            </div>
+
+      <!-- Menú -->
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <!-- Menú para USUARIO -->
+          <li class="user-only" id="navInicioUser"><a href="principal_usuario.html"><i class="fas fa-home"></i><span>Inicio</span></a></li>
+          <li class="user-only" id="navControlUser"><a href="control_user.html"><i class="fas fa-tachometer-alt"></i><span>Control</span></a></li>
+          <li class="user-only" id="navIOTUser"><a href="iot_user.html"><i class="fas fa-broadcast-tower"></i><span>IoT</span></a></li>
+          <li class="user-only" id="navReportesUser"><a href="reportes.html" class="active"><i class="fas fa-file-alt"></i><span>Reportes</span></a></li>
+        </ul>
+      </nav>
+
+            <!-- Info de usuario -->
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="welcome-msg" id="greetingMessage">Bienvenido</span>
+                    <span class="username" id="usernameDisplay">Cargando..</span>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user" id="userIcon"></i>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="dashboard-content">
+        <!-- Sección Hero -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <h2 id="heroGreeting">Panel <span class="highlight">Usuario</span></h2>
+                <p class="hero-text">Consulta tus sensores y accede al tablero con métricas IoT</p>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-microchip"></i>
+                        <div>
+                            <span class="stat-value" id="totalSensores">0</span>
+                            <span class="stat-label">Sensores Activos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                            <span class="stat-value" id="totalStats">0</span>
+                            <span class="stat-label">Estadísticas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Opciones principales para usuarios -->
+        <section class="user-actions">
+            <h3 class="section-title"><span>Acciones</span></h3>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-plug"></i></div>
+                    <h4>Monitoreo de Sensores</h4>
+                    <p>Supervisa los dispositivos IoT conectados.</p>
+                    <a href="control.html" class="feature-btn">Ir a Control</a>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>Reportes</h4>
+                    <p>Visualiza métricas y estadísticas de tu entorno IoT.</p>
+                    <a href="reportes.html" class="feature-btn">Ver Repotes</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Actividad reciente 
+        <section class="recent-activity">
+            <h3 class="section-title"><span>Actividad Reciente</span></h3>
+            <div class="activity-list" id="activityList">
+                <p class="placeholder">Cargando actividad reciente...</p>
+            </div>
+        </section>
+    </main>-->
+    
+    <!-- Sección de FAQ -->
+    <section class="faq-section">
+  <h3 class="section-title"><span>Preguntas Frecuentes</span></h3>
+  <div class="faq-list">
+    
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>📡 ¿Cómo agrego un nuevo sensor?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        <p>Puedes agregar sensores desde la sección <strong>Control</strong>, presionando el botón <em>“Agregar sensor”</em>.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>🔒 ¿Cómo protejo mis dispositivos IoT?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        <p>Usa contraseñas seguras, actualiza el firmware y revisa periódicamente los accesos en el panel de usuario.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>📊 ¿Dónde puedo ver los reportes de mis sensores?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        <p>En el apartado <strong>Reportes</strong>, encontrarás métricas detalladas de los datos de tus sensores por fecha.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+    <!-- Consejos de Seguridad IoT -->
+    <section class="security-tips">
+        <h3 class="section-title"><span>Consejos de Seguridad IoT</span></h3>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <i class="fas fa-lock"></i>
+                <h4>Protege tus contraseñas</h4>
+                <p>Usa claves seguras y cámbialas periódicamente.</p>
+            </div>
+            <div class="tip-card">
+                <i class="fas fa-shield-alt"></i>
+                <h4>Actualiza tus dispositivos</h4>
+                <p>Mantén tus sensores y sistemas con las últimas actualizaciones.</p>
+            </div>
+            <div class="tip-card">
+                <i class="fas fa-network-wired"></i>
+                <h4>Monitorea tu red</h4>
+                <p>Verifica regularmente el tráfico y accesos sospechosos.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recursos adicionales -->
+    <section class="resources">
+        <h3 class="section-title"><span>Recursos</span></h3>
+        <ul class="resources-list">
+           
+            <li><a href="https://thingspeak.com" target="_blank"><i class="fas fa-external-link-alt"></i> Plataforma ThingSpeak</a></li>
+            <li><a href="https://powerbi.microsoft.com" target="_blank"><i class="fas fa-chart-pie"></i> Dashboard en Power BI</a></li>
+        </ul>
+    </section>
+
+    <!-- Chatbot -->
+    <a class="btn-whats pulse" href="https://wa.me/573052566649?text=Hola%20soy%20tu%20asistente%20de%20IoT">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+<script>
+    document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', () => {
+      const parent = item.parentElement;
+
+      // Cerrar otros antes de abrir uno nuevo (opcional)
+      document.querySelectorAll('.faq-item').forEach(faq => {
+        if (faq !== parent) {
+          faq.classList.remove('active');
+        }
+      });
+
+      parent.classList.toggle('active');
+    });
+  });
+    </script>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/Principal.js"></script>
+    <script src="js/usuarios.js"></script>
+    <script src="js/control.js"></script>
+</body>
+</html>

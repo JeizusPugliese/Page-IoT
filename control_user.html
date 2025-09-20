@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control IoT | Monitoreo de Sensores</title>
+    <link href="css/prueba.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body class="dashboard">
+    <!-- Barra de navegación superior -->
+    <header class="dashboard-header">
+        <div class="header-container">
+            <div class="header-title">
+                <h1>Control<span>IoT</span></h1>
+            </div>
+      <!-- Menú -->
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <!-- Menú para USUARIO -->
+          <li class="user-only" id="navInicioUser"><a href="principal_usuario.html"><i class="fas fa-home"></i><span>Inicio</span></a></li>
+          <li class="user-only" id="navControlUser"><a href="control_user.html"><i class="fas fa-tachometer-alt"></i><span>Control</span></a></li>
+          <li class="user-only" id="navIOTUser"><a href="iot_user.html"><i class="fas fa-broadcast-tower"></i><span>IoT</span></a></li>
+          <li class="user-only" id="navReportesUser"><a href="reportes.html" class="active"><i class="fas fa-file-alt"></i><span>Reportes</span></a></li>
+        </ul>
+      </nav>
+
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="welcome-msg">Bienvenido</span>
+                    <span class="username" id="usernameDisplay">Cargando..</span>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user-circle" id="userIcon"></i>
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="dashboard-content" id="mainContent">
+        <!-- Mensaje de bienvenida y guía rápida -->
+        <section class="welcome-section" style="text-align:center;margin-bottom:2rem;">
+            <h2>¡Bienvenido a tu Panel de Control de Sensores!</h2>
+            <p>Desde aquí puedes agregar, monitorear y eliminar tus sensores IoT de forma sencilla.<br>
+            Haz clic en <b>Agregar sensor</b> para comenzar o usa el botón <b>Actualizar</b> para ver tus sensores.</p>
+        </section>
+        <!-- Encabezado -->
+        <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <h2 class="section-title"><span>Monitoreo en Tiempo Real</span></h2>
+            <div class="section-buttons">
+                <button class="refresh-btn" id="refresh-btn"><i class="fas fa-sync-alt"></i> Actualizar</button>
+            </div>
+        </div>
+        <div class="last-update" style="text-align:right;margin-bottom:1rem;">
+            <i class="fas fa-clock"></i>
+            <span id="last-update-text">Última actualización: --:--:--</span>
+        </div>
+        <!-- Grid de sensores -->
+        <div class="sensor-grid" id="sensorGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;min-height:200px;">
+            <!-- Aquí se renderizan los sensores del usuario -->
+        </div>
+        <!-- Modal tipo weather-app para datos del sensor -->
+        <div id="sensorDataModal" class="weather-modal" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);justify-content:center;align-items:center;">
+            <div class="weather-modal-content" style="background:#1e3556 url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80') center/cover no-repeat;border-radius:18px;box-shadow:0 8px 32px rgba(30,53,86,0.25);padding:2.5rem 2.5rem 2rem 2.5rem;min-width:320px;max-width:420px;width:90vw;position:relative;color:#fff;text-align:center;">
+                <button id="closeSensorDataModal" style="position:absolute;top:1.2rem;right:1.2rem;background:rgba(0,0,0,0.18);border:none;border-radius:50%;width:2.2rem;height:2.2rem;color:#fff;font-size:1.3rem;cursor:pointer;"><i class="fas fa-times"></i></button>
+                <div id="sensorDataModalContent">
+                    <!-- Aquí se inyecta el contenido dinámico del sensor -->
+                </div>
+            </div>
+        </div>
+        <div class="stats-cards" style="display:flex;gap:1rem;justify-content:center;margin:2rem 0;">
+            <div class="stat-card">
+                <i class="fas fa-microchip"></i>
+                <div>
+                    <span class="stat-value" id="totalSensores">0</span>
+                    <span class="stat-label-rep">Sensores registrados</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta de gráfico -->
+        <div class="graph-card" id="graphCard">
+            <div class="graph-card-header">
+                <h4>Gráfico del Sensor</h4>
+                <button class="close-btn" onclick="cerrarGrafico()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="graph-card-body">
+                <iframe id="iframeGrafico" src="" frameborder="0" loading="lazy"></iframe>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Historial -->
+    <div class="modal" id="historialModal">
+        <!-- tu modal original -->
+    </div>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <!-- tu chatbot original -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/tipo_sensor.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/usuarios.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/control.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero IoT | Power BI</title>
+    <link href="css/prueba.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body class="dashboard">
+    <!-- Barra de navegación superior con menú horizontal -->
+    <header class="dashboard-header">
+        <div class="header-container">
+            <div class="header-title">
+                <h1>Tablero<span>IoT</span></h1>
+            </div>
+
+      <!-- Menú -->
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <!-- Menú para ADMIN -->
+          <li class="admin-only" id="navInicioAdmin"><a href="principal_admin.html"><i class="fas fa-home"></i><span>Inicio</span></a></li>
+          <li class="admin-only" id="navControlAdmin"><a href="control_admin.html"><i class="fas fa-tachometer-alt"></i><span>Control</span></a></li>
+          <li class="admin-only" id="navIOTAdmin"><a href="iot_admin.html"><i class="fas fa-broadcast-tower"></i><span>IoT</span></a></li>
+          <li class="admin-only" id="navTablero"><a href="tablero.html"><i class="fas fa-chart-line"></i><span>Tablero</span></a></li>
+          <li class="admin-only" id="navUsuarios"><a href="usuarios.html"><i class="fas fa-users-cog"></i><span>Usuarios</span></a></li>
+          <li class="admin-only" id="navReportesAdmin"><a href="reportes_admin.html" class="active"><i class="fas fa-file-alt"></i><span>Reportes</span></a></li>
+        </ul>
+      </nav>
+
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="welcome-msg">Bienvenido</span>
+                    <span class="username" id="usernameDisplay">Cargando..</span>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user-circle" id="userIcon"></i>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+        <!-- Contenido principal (modificado para Power BI) -->
+        <main class="dashboard-content" style="padding: 0;" id="mainContent">
+            <div id="powerbi-container" style="height: calc(100vh - 70px);">
+                <iframe id="iframe-powerbi"
+                    src="https://app.powerbi.com/view?r=eyJrIjoiZjczOTAzODYtZDU3Ni00N2M1LWI4OWItNGFlODEzYWNmNmY0IiwidCI6IjFlOWFhYmU4LTY3ZjgtNGYxYy1hMzI5LWE3NTRlOTI0OTlhZSIsImMiOjR9"
+                    frameborder="0" allowfullscreen style="width: 100%; height: 100%;">
+                </iframe>
+            </div>
+        </main>
+    <!-- Botón flotante del chatbot 
+    <button id="chatbot-button">💬</button>
+
+     
+    <div id="chatbot-window">
+        <div id="chatbot-header">Chatbot</div>
+        <div id="chatbot-body"></div>
+        <div>
+            <input type="text" id="user-input" placeholder="Escribe tu mensaje">
+            <button id="send-button">Enviar</button>
+        </div>
+    </div>
+    Ventana del chatbot -->
+
+    <!-- Scripts (manteniendo los originales) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/create.js"></script>
+    <script src="js/usuarios.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenTech - Iniciar Sesión</title>
+  <meta name="description"
+    content="Inicia sesión en GreenTech para acceder a nuestra plataforma de servicios tecnológicos">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+  </style>
+  <link href="css/login.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+  <div class="house">
+    <img src="img/house.svg" alt="House Icon" class="house-icon" 
+      style="position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; cursor: pointer;"
+      onclick="window.location.href='index.html'">
+    <div class="brand-name" style="position: absolute; top: 25px; left: 70px; font-size: 24px; font-weight: 600; color: white; cursor: pointer;"
+      onclick="window.location.href='index.html'">
+  </div>
+
+  <div class="login-container">
+    <section class="gradient-form py-4">
+      <div class="container h-100">
+        <div class="row justify-content-center align-items-center min-vh-95">
+          <div class="col-xl-10">
+            <div class="login-card">
+              <div class="row g-0">
+                <!-- Formulario lado izquierdo -->
+                <div class="col-lg-6 form-side">
+                  <div class="card-body p-md-5 mx-md-4 d-flex flex-column justify-content-center">
+                    <div class="text-center mb-4">
+                      <h2 class="text-white mb-3">Iniciar sesión</h2>
+                    </div>
+                    <form class="w-100 px-3">
+                      <div class="mb-4">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                          <input type="email" class="form-control" id="txtcorreo"
+                            placeholder="Ingrese su correo electrónico" required>
+                        </div>
+                      </div>
+                      <div class="mb-4">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                          <input type="password" class="form-control" id="txtpassword" placeholder="Ingrese su contraseña"
+                            required>
+                          <button class="btn toggle-password" type="button" id="togglePasswordBtn">
+                            <i class="far fa-eye"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="d-grid mt-4">
+                        <button type="button" class="btn btn-login btn-lg" onclick="validarlogin()">
+                          <i class="fas fa-sign-in-alt me-2"></i> Ingresar
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <!-- Panel lateral derecho -->
+                <div class="col-lg-6 info-side">
+                  <div class="text-white px-3 py-4 p-md-5 mx-md-4 d-flex flex-column justify-content-center h-100">
+                    <h3 class="fw-bold mb-4">Bienvenido a GreenTech</h3>
+                    <p class="mb-4">Explora nuestras funcionalidades y descubre lo que tenemos para ofrecerte. Conéctate
+                      con la tecnología del futuro.</p>
+                    <div class="features-list">
+                      <div class="feature-item mb-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span>Acceso seguro y encriptado</span>
+                      </div>
+                      <div class="feature-item mb-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span>Monitoreo en tiempo real</span>
+                      </div>
+                      <div class="feature-item mb-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span>Soporte técnico 24/7</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="container py-4 mt-auto">
+      <div class="text-center mt-4 pt-3 border-top border-secondary footer-azure" style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
+        <img src="img/azure.png" alt="Microsoft Azure" class="azure-logo-footer"
+             style="background:transparent;object-fit:contain;max-width:120px;max-height:60px;image-rendering:auto;">
+        <p class="text-white-50 mb-0">© 2023 GreenTech. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+    <style>
+      .footer-azure {
+        background: rgba(255,255,255,0.08);
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(35,41,70,0.13);
+        padding: 2rem 0 1.2rem 0;
+        margin-bottom: 1.5rem;
+        transition: background 0.3s;
+      }
+      .azure-logo-footer {
+        height: 60px;
+        width: auto;
+        max-width: 120px;
+        max-height: 60px;
+        background: transparent !important;
+        border-radius: 12px;
+        padding: 0.5rem 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
+        cursor: pointer;
+        object-fit: contain;
+        image-rendering: auto;
+      }
+      .azure-logo-footer:hover {
+        transform: scale(1.08);
+        box-shadow: 0 6px 24px rgba(35,41,70,0.22);
+        filter: brightness(1.15) drop-shadow(0 0 8px #0078d4aa);
+        background: transparent !important;
+      }
+    </style>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="js/scripts.js"></script>
+  <script src="js/usuarios.js"></script>
+</body>
+
+</html>

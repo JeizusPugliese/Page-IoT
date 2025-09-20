@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Control IoT | Visualización</title>
+    <link rel="stylesheet" href="css/prueba.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="dashboard">
+<body class="dashboard">
+    <!-- Barra de navegación superior con menú horizontal -->
+    <header class="dashboard-header">
+        <div class="header-container">
+            <div class="header-title">
+                <h1><span>IoT</span></h1>
+            </div>
+
+      <!-- Menú -->
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <!-- Menú para ADMIN -->
+          <li class="admin-only" id="navInicioAdmin"><a href="principal_admin.html"><i class="fas fa-home"></i><span>Inicio</span></a></li>
+          <li class="admin-only" id="navControlAdmin"><a href="control_admin.html"><i class="fas fa-tachometer-alt"></i><span>Control</span></a></li>
+          <li class="admin-only" id="navIOTAdmin"><a href="iot_admin.html"><i class="fas fa-broadcast-tower"></i><span>IoT</span></a></li>
+          <li class="admin-only" id="navTablero"><a href="tablero.html"><i class="fas fa-chart-line"></i><span>Tablero</span></a></li>
+          <li class="admin-only" id="navUsuarios"><a href="usuarios.html"><i class="fas fa-users-cog"></i><span>Usuarios</span></a></li>
+          <li class="admin-only" id="navReportesAdmin"><a href="reportes_admin.html" class="active"><i class="fas fa-file-alt"></i><span>Reportes</span></a></li>
+        </ul>
+      </nav>
+
+            <div class="user-menu">
+                <div class="user-info">
+                    <span class="welcome-msg">Bienvenido</span>
+                    <span class="username" id="usernameDisplay">Cargando..</span>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user-circle" id="userIcon"></i>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="dashboard-content">
+        <section class="iot-section">
+            <h2 class="section-title"><span>Visualización en Tiempo Real</span></h2>
+            <div class="container-fluid px-4">
+                <div class="page-header">
+                    <h1 class="mt-4"><i class="fas fa-chart-line me-2"></i>Monitoreo de Sensores</h1>
+                    <div class="refresh-controls">
+                        <span class="last-update">
+                            <i class="fas fa-clock"></i>
+                            <span id="last-update-text">Actualizado: Justo ahora</span>
+                        </span>
+                        <button class="refresh-btn" id="refresh-btn">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+                <div class="iot-grid">
+                    <!-- Sensor de Gas -->
+                    <div class="iot-card">
+                        <div class="iot-header">
+                            <i class="fas fa-burn"></i>
+                            <h3>Sensor de Gas</h3>
+                            <div class="graph-status">
+                                <div class="status-dot"></div>
+                                <span>Activo</span>
+                            </div>
+                        </div>
+                        <iframe src="https://thingspeak.com/channels/2548628/widgets/930296" loading="lazy"></iframe>
+                        <div class="graph-footer">
+                            <span class="last-update">
+                                <i class="fas fa-clock"></i>
+                                <span class="update-time">Justo ahora</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sensor PIR -->
+                    <div class="iot-card">
+                        <div class="iot-header">
+                            <i class="fas fa-running"></i>
+                            <h3>Sensor PIR (Movimiento)</h3>
+                            <div class="graph-status">
+                                <div class="status-dot"></div>
+                                <span>Activo</span>
+                            </div>
+                        </div>
+                        <iframe src="https://thingspeak.com/channels/2548628/widgets/930300" loading="lazy"></iframe>
+                        <div class="graph-footer">
+                            <span class="last-update">
+                                <i class="fas fa-clock"></i>
+                                <span class="update-time">Justo ahora</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sensor de Temperatura -->
+                    <div class="iot-card">
+                        <div class="iot-header">
+                            <i class="fas fa-thermometer-half"></i>
+                            <h3>Sensor de Temperatura</h3>
+                            <div class="graph-status">
+                                <div class="status-dot"></div>
+                                <span>Activo</span>
+                            </div>
+                        </div>
+                        <iframe src="https://thingspeak.com/channels/2548628/widgets/930294" loading="lazy"></iframe>
+                        <div class="graph-footer">
+                            <span class="last-update">
+                                <i class="fas fa-clock"></i>
+                                <span class="update-time">Justo ahora</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sensor de Humedad -->
+                    <div class="iot-card">
+                        <div class="iot-header">
+                            <i class="fas fa-tint"></i>
+                            <h3>Sensor de Humedad</h3>
+                            <div class="graph-status">
+                                <div class="status-dot"></div>
+                                <span>Activo</span>
+                            </div>
+                        </div>
+                        <iframe src="https://thingspeak.com/channels/2548628/widgets/930295" loading="lazy"></iframe>
+                        <div class="graph-footer">
+                            <span class="last-update">
+                                <i class="fas fa-clock"></i>
+                                <span class="update-time">Justo ahora</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sensor Ultrasonido -->
+                    <div class="iot-card">
+                        <div class="iot-header">
+                            <i class="fas fa-ruler"></i>
+                            <h3>Sensor Ultrasonido</h3>
+                            <div class="graph-status">
+                                <div class="status-dot"></div>
+                                <span>Activo</span>
+                            </div>
+                        </div>
+                        <iframe src="https://thingspeak.com/channels/2548628/widgets/930301" loading="lazy"></iframe>
+                        <div class="graph-footer">
+                            <span class="last-update">
+                                <i class="fas fa-clock"></i>
+                                <span class="update-time">Justo ahora</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Sensor de Luz -->
+                    <div class="iot-card">
+                        <div class="iot-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h3>Sensor de Luz</h3>
+                            <div class="graph-status">
+                                <div class="status-dot"></div>
+                                <span>Activo</span>
+                            </div>
+                        </div>
+                        <iframe src="https://thingspeak.com/channels/2548628/widgets/930297" loading="lazy"></iframe>
+                        <div class="graph-footer">
+                            <span class="last-update">
+                                <i class="fas fa-clock"></i>
+                                <span class="update-time">Justo ahora</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+        </section>
+    </main>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-toggle" id="chatbot-button">
+            <i class="fas fa-robot"></i>
+        </button>
+        <div class="chatbot-window" id="chatbot-window">
+            <div class="chatbot-header">
+                <h3>Asistente IoT</h3>
+                <button class="close-chatbot"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-body"></div>
+            <div class="chatbot-input">
+                <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
+                <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/usuarios.js"></script>
+    <script>
+        // Función para actualizar los tiempos y gráficas
+        function updateData() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+
+            // Actualizar el texto de última actualización
+            document.getElementById('last-update-text').textContent = `Actualizado: ${timeString}`;
+            document.querySelectorAll('.update-time').forEach(el => {
+                el.textContent = timeString;
+            });
+
+            // Forzar recarga de iframes (solución simple para actualizar gráficas)
+            document.querySelectorAll('iframe').forEach(iframe => {
+                iframe.src = iframe.src;
+            });
+        }
+
+        // Botón de actualización
+        document.getElementById('refresh-btn').addEventListener('click', function () {
+            const btn = this;
+            btn.innerHTML = '<i class="fas fa-spinner loading"></i> Actualizando...';
+            btn.disabled = true;
+
+            // Simular tiempo de carga
+            setTimeout(() => {
+                updateData();
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar';
+                btn.disabled = false;
+            }, 1000);
+        });
+
+
+        // Actualizar cada 2 minutos automáticamente
+        setInterval(updateData, 120000);
+
+    </script>
+</body>
+
+</html>
