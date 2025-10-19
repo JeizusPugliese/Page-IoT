@@ -223,17 +223,9 @@
                     <label for="adminSensorName">Nombre del sensor</label>
                     <input id="adminSensorName" type="text" required style="width:100%;" />
                   </div>
-                  <div class="form-group" style="flex:0.5;min-width:110px;">
-                    <label for="adminSensorRef">ID del sensor</label>
-                    <select id="adminSensorRef" required style="width:100%;">
-                      <option value="" disabled selected>Seleccione ID</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                      <option value="5">5</option>
-                      <option value="6">6</option>
-                    </select>
+                  <div class="form-group" style="flex:0.5;min-width:160px;">
+                    <label for="adminSensorRef">Referencia del sensor</label>
+                    <input id="adminSensorRef" type="text" placeholder="Ej: DHT11_T_01" required style="width:100%;" />
                   </div>
                   <div class="form-group" style="flex:1;min-width:180px;">
                     <label for="adminSensorTipo">Tipo de sensor</label>
@@ -264,7 +256,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
-    <script src="js/main.js"></script>
     <script src="js/tipo_sensor.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/usuarios.js"></script>

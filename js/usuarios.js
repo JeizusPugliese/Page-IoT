@@ -1,450 +1,501 @@
-function validarlogin() {
-    const correo = document.getElementById('txtcorreo').value.trim();
-    const password = document.getElementById('txtpassword').value.trim();
+(() => {
+  const API_BASE = 'https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net';
+  const STORAGE_KEYS = {
+    token: 'token',
+    role: 'userRole',
+    id: 'userId',
+    name: 'userName'
+  };
 
-    if (correo === "" || password === "") {
-        Swal.fire('Error', 'Por favor ingresa ambos campos', 'error');
-        return;
+  const isLoginView = () => window.location.pathname.toLowerCase().endsWith('login.html');
+  const getToken = () => localStorage.getItem(STORAGE_KEYS.token);
+  const getRole = () => localStorage.getItem(STORAGE_KEYS.role);
+  const getUserId = () => localStorage.getItem(STORAGE_KEYS.id);
+  const getUserName = () => localStorage.getItem(STORAGE_KEYS.name) || 'Usuario';
+
+  const apiClient = (config) => {
+    const token = getToken();
+    const headers = { ...(config.headers || {}) };
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+    return axios({ ...config, headers });
+  };
+
+  const redirectToLogin = () => {
+    localStorage.clear();
+    window.location.replace('login.html');
+  };
+
+  const handleInvalidToken = () => {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Sesión finalizada',
+      text: 'Vuelve a iniciar sesión para continuar.'
+    }).then(redirectToLogin);
+  };
+
+  // ---------------------------
+  //  Autenticación
+  // ---------------------------
+  function validarlogin() {
+    const correo = document.getElementById('txtcorreo');
+    const password = document.getElementById('txtpassword');
+
+    if (!correo || !password) {
+      return;
     }
 
-    axios.post('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/login', {
-        correo: correo,
-        password: password
-    })
-    .then(function (response) {
-        console.log("Respuesta completa:", response); 
-        console.log("Datos:", response.data); 
-        const data = response.data;
+    const email = correo.value.trim();
+    const pass = password.value.trim();
 
-        if (data.success) {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('userRole', data.rol);
-            localStorage.setItem('userId', data.id);
-            localStorage.setItem('userName', data.nombre); // 👈 Guarda el nombre
+    if (!email || !pass) {
+      Swal.fire('Error', 'Por favor ingresa ambos campos', 'error');
+      return;
+    }
 
-            if (data.rol === 'admin') {
-                Swal.fire('Éxito', `Bienvenido ${data.nombre} (Administrador)`, 'success').then(() => {
-                    window.location.href = 'principal_admin.html'; 
-                });
-            } else if (data.rol === 'usuario') {
-                Swal.fire('Éxito', `Bienvenido ${data.nombre}`, 'success').then(() => {
-                    window.location.href = 'principal_usuario.html';  
-                });
-            } else {
-                Swal.fire('Error', 'Rol no reconocido', 'error');
-            }
-        } else {
-            Swal.fire('Error', 'Correo o contraseña incorrectos', 'error');
+    axios.post(`${API_BASE}/login`, { correo: email, password: pass })
+      .then(({ data }) => {
+        if (!data?.success) {
+          Swal.fire('Error', 'Credenciales incorrectas', 'error');
+          return;
         }
-    })
-    .catch(function (error) {
-        console.error('Error al hacer login:', error);
-        Swal.fire('Error', 'Ocurrió un problema al iniciar sesión', 'error');
+
+        localStorage.setItem(STORAGE_KEYS.token, data.token);
+        localStorage.setItem(STORAGE_KEYS.role, data.rol);
+        localStorage.setItem(STORAGE_KEYS.id, data.id);
+        localStorage.setItem(STORAGE_KEYS.name, data.nombre);
+
+        const destino = data.rol === 'admin' ? 'principal_admin.html' : 'principal_usuario.html';
+        Swal.fire('Bienvenido', data.nombre, 'success').then(() => {
+          window.location.href = destino;
+        });
+      })
+      .catch((error) => {
+        console.error('Error al iniciar sesión:', error);
+        Swal.fire('Error', 'No se pudo iniciar sesión. Intenta nuevamente.', 'error');
+      });
+  }
+
+  function logout() {
+    const token = getToken();
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: 'Confirma para salir del sistema.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#4361ee',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      if (!token) {
+        redirectToLogin();
+        return;
+      }
+
+      apiClient({ method: 'POST', url: `${API_BASE}/logout` })
+        .catch((error) => {
+          console.warn('Error al cerrar sesión:', error);
+        })
+        .finally(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Sesión cerrada',
+            timer: 1200,
+            showConfirmButton: false
+          }).then(redirectToLogin);
+        });
     });
-}
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
+  function verifyToken() {
+    const token = getToken();
+    if (!token) {
+      if (!isLoginView()) {
+        handleInvalidToken();
+      }
+      return;
+    }
 
-    // Mostrar/ocultar pestañas del menú según el rol y marcar activa la pestaña correcta
-    const adminTabs = document.querySelectorAll('.admin-only');
-    const userTabs = document.querySelectorAll('.user-only');
+    apiClient({ method: 'POST', url: `${API_BASE}/verificar_token` })
+      .then(({ data }) => {
+        if (!data?.success) {
+          handleInvalidToken();
+        }
+      })
+      .catch((error) => {
+        console.error('Error verificando token:', error);
+        handleInvalidToken();
+      });
+  }
 
-    // Quitar clase 'active' de todos los enlaces
-    document.querySelectorAll('.main-nav a').forEach(a => a.classList.remove('active'));
+  // ---------------------------
+  //  UI Helpers
+  // ---------------------------
+  function applyNavigationState() {
+    const nav = document.querySelector('.main-nav');
+    if (!nav) return;
 
-    if (userRole === 'admin') {
-        userTabs.forEach(tab => tab.style.display = 'none');
-        adminTabs.forEach(tab => tab.style.display = '');
-        // Marcar activa la pestaña de reportes admin si existe
-        const repAdmin = document.querySelector('#navReportesAdmin a');
-        if (repAdmin) repAdmin.classList.add('active');
-    } else if (userRole === 'usuario') {
-        adminTabs.forEach(tab => tab.style.display = 'none');
-        userTabs.forEach(tab => tab.style.display = '');
-        // Marcar activa la pestaña de reportes user si existe
-        const repUser = document.querySelector('#navReportesUser a');
-        if (repUser) repUser.classList.add('active');
+    const role = getRole();
+    const adminTabs = nav.querySelectorAll('.admin-only');
+    const userTabs = nav.querySelectorAll('.user-only');
+
+    [...nav.querySelectorAll('a.active')].forEach((link) => link.classList.remove('active'));
+
+    if (role === 'admin') {
+      userTabs.forEach((tab) => tab.setAttribute('hidden', 'hidden'));
+      adminTabs.forEach((tab) => tab.removeAttribute('hidden'));
+      const active = nav.querySelector('#navReportesAdmin a, #navUsuarios a');
+      if (active) active.classList.add('active');
+    } else if (role === 'usuario') {
+      adminTabs.forEach((tab) => tab.setAttribute('hidden', 'hidden'));
+      userTabs.forEach((tab) => tab.removeAttribute('hidden'));
+      const active = nav.querySelector('#navReportesUser a, #navControlUser a');
+      if (active) active.classList.add('active');
     } else {
-        adminTabs.forEach(tab => tab.style.display = 'none');
-        userTabs.forEach(tab => tab.style.display = 'none');
+      [...adminTabs, ...userTabs].forEach((tab) => tab.setAttribute('hidden', 'hidden'));
     }
-});
+  }
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    const userRole = localStorage.getItem('userRole');
-    console.log('Rol del usuario:', userRole);
-    
-    if (userRole === 'admin') {
-        document.body.classList.add('admin-user');
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const userRole = localStorage.getItem('userRole');
-    const userName = localStorage.getItem('userName') || 'Usuario';
-    
-    const usernameDisplay = document.getElementById('usernameDisplay');
+  function updateUserHeader() {
     const userIcon = document.getElementById('userIcon');
     const welcomeMsg = document.querySelector('.welcome-msg');
-    
-    // Ocultamos el span del usernameDisplay
-    usernameDisplay.style.display = 'none';
-    
-    if (userRole === 'admin') {
-        userIcon.className = 'fas fa-user-shield';
-        userIcon.parentElement.classList.add('admin-avatar');
-        welcomeMsg.innerHTML = `<strong>Bienvenido Administrador ${userName}</strong>`;
+    const usernameDisplay = document.getElementById('usernameDisplay');
+    if (!userIcon || !welcomeMsg) return;
+
+    const role = getRole();
+    const name = getUserName();
+
+    if (usernameDisplay) {
+      usernameDisplay.textContent = name;
+    }
+
+    if (role === 'admin') {
+      userIcon.className = 'fas fa-user-shield';
+      welcomeMsg.innerHTML = `<strong>Bienvenido Administrador ${name}</strong>`;
     } else {
-        userIcon.className = 'fas fa-user-circle';
-        userIcon.parentElement.classList.add('user-avatar');
-        welcomeMsg.innerHTML = `<strong>Bienvenido ${userName}</strong>`;
+      userIcon.className = 'fas fa-user-circle';
+      welcomeMsg.innerHTML = `<strong>Bienvenido ${name}</strong>`;
     }
-});
+  }
 
-function logout() {
-    Swal.fire({
-        title: '¿Cerrar sesión?',
-        text: "¿Estás seguro de que deseas salir del sistema?",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#4361ee',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, salir',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            const token = localStorage.getItem('token');
-            axios.post('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/logout', {}, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-            .then(response => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sesión cerrada con éxito',
-                    showConfirmButton: false,
-                    timer: 1500
-                }).then(() => {
-                    localStorage.clear();
-                    // Usar replace en lugar de href para evitar que la página quede en el historial
-                    window.location.replace('login.html');
-                });
-            })
-            .catch(error => {
-                console.error("Error al cerrar sesión:", error);
-                // Aún así limpiamos el localStorage y redirigimos
-                localStorage.clear();
-                window.location.replace('login.html');
-            });
-        }
+  function setupPasswordToggle() {
+    const toggleButton = document.getElementById('togglePasswordBtn');
+    const passwordInput = document.getElementById('txtpassword');
+    if (!toggleButton || !passwordInput) return;
+
+    toggleButton.addEventListener('click', () => {
+      const isHidden = passwordInput.type === 'password';
+      passwordInput.type = isHidden ? 'text' : 'password';
+      toggleButton.innerHTML = isHidden
+        ? '<i class="far fa-eye-slash"></i>'
+        : '<i class="far fa-eye"></i>';
     });
-}
-// Prevenir que el usuario pueda volver atrás después del logout
-window.onload = function() {
-    window.history.forward();
-};
+  }
 
-
-document.addEventListener('DOMContentLoaded', function () {
-    const token = localStorage.getItem('token'); 
-    const isLoginPage = window.location.pathname.includes('login.html');
-
-    if (!token && !isLoginPage) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Sesión expirada',
-            text: 'Debe iniciar sesión nuevamente.',
-            confirmButtonText: 'Aceptar'
-        }).then(() => {
-            window.location.href = 'login.html';
-        });
-    } else if (token && !isLoginPage) {
-        verificarToken(token);
+  function guardSession() {
+    if (!isLoginView()) {
+      verifyToken();
     }
-});
+  }
 
-function verificarToken(token) {
-    axios.post('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/verificar_token', {}, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    })
-    .then(response => {
-        if (!response.data.success) {
-            manejarTokenInvalido();
-        }
-    })
-    .catch(error => {
-        console.error("Error verificando el token:", error);
-        manejarTokenInvalido();
-    });
-}
+  // ---------------------------
+  //  Gestión de usuarios (usuarios.html)
+  // ---------------------------
+  const userModule = (() => {
+    const state = {
+      users: [],
+      filtered: [],
+      currentPage: 1,
+      perPage: 10
+    };
 
+    const elements = {
+      refreshBtn: document.getElementById('refreshUsers'),
+      totalUsers: document.getElementById('totalUsers'),
+      adminUsers: document.getElementById('adminUsers'),
+      lastUpdate: document.getElementById('lastUpdateTime'),
+      tableBody: document.getElementById('usersTableBody'),
+      paginationInfo: document.getElementById('paginationInfo'),
+      prevPage: document.getElementById('prevPage'),
+      nextPage: document.getElementById('nextPage'),
+      currentPage: document.getElementById('currentPage'),
+      searchInput: document.getElementById('userSearch')
+    };
 
+    const modalElements = {
+      editModal: document.getElementById('editUserModal'),
+      deleteModal: document.getElementById('confirmDeleteModal'),
+      editNombre: document.getElementById('editNombre'),
+      editApellido: document.getElementById('editApellido'),
+      editCorreo: document.getElementById('editCorreo'),
+      editCelular: document.getElementById('editCelular'),
+      editRol: document.getElementById('editRol'),
+      editPassword: document.getElementById('editPassword'),
+      deleteCorreo: document.getElementById('deleteCorreo'),
+      deleteName: document.getElementById('userToDelete')
+    };
 
-   // Función para mostrar/ocultar contraseña
-    function setupPasswordToggle() {
-      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
-      const passwordInput = document.getElementById('txtpassword');
-      
-      if (togglePasswordBtn && passwordInput) {
-        togglePasswordBtn.addEventListener('click', function() {
-          // Cambiar el tipo de input
-          if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            togglePasswordBtn.innerHTML = '<i class="far fa-eye-slash"></i>';
-          } else {
-            passwordInput.type = 'password';
-            togglePasswordBtn.innerHTML = '<i class="far fa-eye"></i>';
-          }
-        });
+    const hasUserPage = () => Boolean(elements.tableBody);
+
+    function renderStats() {
+      if (!elements.totalUsers || !elements.adminUsers) return;
+      const adminCount = state.users.filter((user) => Number(user.rol) === 1).length;
+      elements.totalUsers.textContent = state.users.length;
+      elements.adminUsers.textContent = adminCount;
+    }
+
+    function renderTable() {
+      if (!elements.tableBody) return;
+
+      elements.tableBody.innerHTML = '';
+      const start = (state.currentPage - 1) * state.perPage;
+      const end = Math.min(start + state.perPage, state.filtered.length);
+
+      for (let i = start; i < end; i += 1) {
+        const user = state.filtered[i];
+        const row = document.createElement('tr');
+        const rolTexto = Number(user.rol) === 1 ? 'Admin' : 'Usuario';
+        const rolClase = Number(user.rol) === 1 ? 'admin' : 'user';
+
+        row.innerHTML = `
+          <td>
+            <div class="user-avatar">
+              <i class="fas fa-user-circle"></i>
+              <span>${user.nombre} ${user.apellido || ''}</span>
+            </div>
+          </td>
+          <td>${user.correo}</td>
+          <td><span class="badge ${rolClase}">${rolTexto}</span></td>
+          <td>
+            <button class="btn-action edit" title="Editar" data-action="edit" data-correo="${user.correo}">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-action delete" title="Eliminar" data-action="delete" data-correo="${user.correo}" data-nombre="${user.nombre} ${user.apellido || ''}">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        `;
+        elements.tableBody.appendChild(row);
+      }
+
+      if (elements.paginationInfo) {
+        const text = state.filtered.length === 0
+          ? 'No hay usuarios para mostrar'
+          : `Mostrando ${state.filtered.length === 0 ? 0 : start + 1}-${end} de ${state.filtered.length} usuarios`;
+        elements.paginationInfo.textContent = text;
+      }
+
+      if (elements.currentPage) {
+        elements.currentPage.textContent = state.currentPage;
+      }
+
+      if (elements.prevPage) {
+        elements.prevPage.disabled = state.currentPage === 1;
+      }
+
+      if (elements.nextPage) {
+        const totalPages = Math.ceil(state.filtered.length / state.perPage) || 1;
+        elements.nextPage.disabled = state.currentPage >= totalPages;
       }
     }
 
-    // Esperar a que el DOM esté completamente cargado
-    document.addEventListener('DOMContentLoaded', function() {
-      setupPasswordToggle();
-    });
-
-    // También asegurarnos de que funcione si el DOM ya está cargado
-    if (document.readyState !== 'loading') {
-      setupPasswordToggle();
+    function applyFilter(term) {
+      const value = term.trim().toLowerCase();
+      if (!value) {
+        state.filtered = [...state.users];
+      } else {
+        state.filtered = state.users.filter((user) => {
+          const fullName = `${user.nombre} ${user.apellido || ''}`.toLowerCase();
+          return fullName.includes(value) || user.correo.toLowerCase().includes(value);
+        });
+      }
+      state.currentPage = 1;
+      renderTable();
     }
 
+    function setLoading(isLoading) {
+      const loader = document.getElementById('topLoader');
+      if (loader) loader.classList.toggle('active', isLoading);
+      if (elements.refreshBtn) elements.refreshBtn.classList.toggle('loading', isLoading);
+    }
 
+    function loadUsers() {
+      setLoading(true);
+      return apiClient({ method: 'GET', url: `${API_BASE}/obtener_usuarios` })
+        .then(({ data }) => {
+          state.users = data?.usuarios || [];
+          state.filtered = [...state.users];
+          if (elements.lastUpdate) {
+            const now = new Date();
+            elements.lastUpdate.textContent = now.toLocaleTimeString();
+          }
+          renderStats();
+          renderTable();
+        })
+        .catch((error) => {
+          console.error('Error al cargar usuarios:', error);
+          Swal.fire('Error', 'No se pudo cargar la lista de usuarios', 'error');
+        })
+        .finally(() => setLoading(false));
+    }
 
- // PAGINA DE USUARIOS (usuarios.html)
+    function openEditModal(correo) {
+      if (!modalElements.editModal) return;
+      const user = state.users.find((u) => u.correo === correo);
+      if (!user) return;
 
-        // Variables globales
-        let usuarios = [];
-        let currentPage = 1;
-        const usersPerPage = 10;
-        let filteredUsers = [];
-        
-        // Función para alternar visibilidad de contraseña
-        function togglePassword(fieldId) {
-            const passwordField = document.getElementById(fieldId);
-            const toggleBtn = passwordField.nextElementSibling.querySelector('i');
-            
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                toggleBtn.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                passwordField.type = "password";
-                toggleBtn.classList.replace('fa-eye-slash', 'fa-eye');
-            }
-        }
-        
-        // Función para cerrar modales
-        function cerrarModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        // Función para abrir modal de edición
-        function abrirModalEdicion(correo) {
-            // Buscar el usuario en la lista
-            const usuario = usuarios.find(u => u.correo === correo);
-            
-            if (usuario) {
-                document.getElementById('editNombre').value = usuario.nombre;
-                document.getElementById('editApellido').value = usuario.apellido;
-                document.getElementById('editCorreo').value = usuario.correo;
-                document.getElementById('editCelular').value = usuario.celular;
-                document.getElementById('editRol').value = usuario.rol;
-                document.getElementById('editPassword').value = '';
-                
-                document.getElementById('editUserModal').style.display = 'flex';
-            }
-        }
-        
-        // Función para abrir modal de confirmación de eliminación
-        function abrirModalEliminacion(correo, nombreCompleto) {
-            document.getElementById('userToDelete').textContent = nombreCompleto;
-            document.getElementById('deleteCorreo').value = correo;
-            document.getElementById('confirmDeleteModal').style.display = 'flex';
-        }
-        
-        // Función para cargar usuarios desde la API
-        function cargarUsuarios() {
-            document.getElementById('refreshUsers').classList.add('loading');
-            
-            axios.get('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/obtener_usuarios')
-                .then(response => {
-                    usuarios = response.data.usuarios || [];
-                    filteredUsers = [...usuarios];
-                    
-                    // Actualizar estadísticas
-                    actualizarEstadisticas();
-                    
-                    // Renderizar tabla
-                    renderizarTablaUsuarios();
-                    
-                    // Actualizar marca de tiempo
-                    const ahora = new Date();
-                    document.getElementById('lastUpdateTime').textContent = 
-                        `Hoy a las ${ahora.getHours()}:${ahora.getMinutes().toString().padStart(2, '0')}`;
-                })
-                .catch(error => {
-                    console.error('Error al cargar usuarios:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se pudo cargar la lista de usuarios',
-                    });
-                })
-                .finally(() => {
-                    document.getElementById('refreshUsers').classList.remove('loading');
-                });
-        }
-        
-        // Función para actualizar las estadísticas
-        function actualizarEstadisticas() {
-            const total = usuarios.length;
-            const admins = usuarios.filter(u => u.rol == 1).length;
-            
-            document.getElementById('totalUsers').textContent = total;
-            document.getElementById('adminUsers').textContent = admins;
-        }
-        
-        // Función para renderizar la tabla de usuarios
-        function renderizarTablaUsuarios() {
-            const tableBody = document.getElementById('usersTableBody');
-            tableBody.innerHTML = '';
-            
-            const startIndex = (currentPage - 1) * usersPerPage;
-            const endIndex = Math.min(startIndex + usersPerPage, filteredUsers.length);
-            
-            for (let i = startIndex; i < endIndex; i++) {
-                const usuario = filteredUsers[i];
-                const row = document.createElement('tr');
-                
-                // Mapear roles a texto
-                let rolTexto = '';
-                let rolClase = '';
-                switch(usuario.rol) {
-                    case 1: rolTexto = 'Admin'; rolClase = 'admin'; break;
-                    case 2: rolTexto = 'Usuario'; rolClase = 'user'; break;
-                }
-                
-                
-                row.innerHTML = `
-                    <td>
-                        <div class="user-avatar">
-                            <i class="fas fa-user-circle"></i>
-                            <span>${usuario.nombre} ${usuario.apellido}</span>
-                        </div>
-                    </td>
-                    <td>${usuario.correo}</td>
-                    <td><span class="badge ${rolClase}">${rolTexto}</span></td>
-                    <td>
-                        <button class="btn-action edit" title="Editar" onclick="abrirModalEdicion('${usuario.correo}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-action delete" title="Eliminar" onclick="abrirModalEliminacion('${usuario.correo}', '${usuario.nombre} ${usuario.apellido}')">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
-            }
-            
-            // Actualizar información de paginación
-            document.getElementById('paginationInfo').textContent = 
-                `Mostrando ${startIndex + 1}-${endIndex} de ${filteredUsers.length} usuarios`;
-            document.getElementById('currentPage').textContent = currentPage;
-            
-            // Habilitar/deshabilitar botones de paginación
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = endIndex >= filteredUsers.length;
-        }
-        
-        // Función para buscar usuarios
-        function buscarUsuarios() {
-            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-            
-            if (searchTerm === '') {
-                filteredUsers = [...usuarios];
-            } else {
-                filteredUsers = usuarios.filter(u => 
-                    u.nombre.toLowerCase().includes(searchTerm) || 
-                    u.apellido.toLowerCase().includes(searchTerm) ||
-                    u.correo.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            currentPage = 1; // Resetear a la primera página
-            renderizarTablaUsuarios();
-        }
-        
-        // Función para eliminar usuario confirmado
-        function eliminarUsuarioConfirmado() {
-            const correo = document.getElementById('deleteCorreo').value;
-            
-            axios.delete(`https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/eliminar_usuario/${correo}`)
-                .then(response => {
-                    if (response.data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Usuario eliminado',
-                            text: 'El usuario ha sido eliminado correctamente',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        
-                        // Cerrar modal y recargar lista
-                        cerrarModal('confirmDeleteModal');
-                        cargarUsuarios();
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'No se pudo eliminar el usuario',
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al eliminar usuario:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Hubo un problema al eliminar el usuario',
-                    });
-                });
-        }
-        
-        // Event listeners
-        document.getElementById('refreshUsers').addEventListener('click', function() {
-            this.classList.add('loading');
-            cargarUsuarios();
+      modalElements.editNombre.value = user.nombre;
+      modalElements.editApellido.value = user.apellido || '';
+      modalElements.editCorreo.value = user.correo;
+      modalElements.editCelular.value = user.celular || '';
+      modalElements.editRol.value = user.rol;
+      modalElements.editPassword.value = '';
+      modalElements.editModal.style.display = 'flex';
+    }
+
+    function openDeleteModal(correo, nombreCompleto) {
+      if (!modalElements.deleteModal) return;
+      modalElements.deleteCorreo.value = correo;
+      modalElements.deleteName.textContent = nombreCompleto;
+      modalElements.deleteModal.style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.style.display = 'none';
+    }
+
+    function saveUserChanges(event) {
+      event?.preventDefault();
+      if (!modalElements.editCorreo) return;
+
+      const payload = {
+        nombre: modalElements.editNombre.value.trim(),
+        apellido: modalElements.editApellido.value.trim(),
+        correo: modalElements.editCorreo.value.trim(),
+        celular: modalElements.editCelular.value.trim(),
+        password: modalElements.editPassword.value.trim() || undefined
+      };
+
+      if (!payload.nombre || !payload.apellido || !payload.correo || !payload.celular) {
+        Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
+        return;
+      }
+
+      apiClient({ method: 'PUT', url: `${API_BASE}/actualizar_usuario`, data: payload })
+        .then(({ data }) => {
+          if (data?.success) {
+            Swal.fire('Actualizado', 'Los datos del usuario se guardaron correctamente', 'success');
+            closeModal('editUserModal');
+            loadUsers();
+          } else {
+            Swal.fire('Error', data?.message || 'No fue posible actualizar el usuario', 'error');
+          }
+        })
+        .catch((error) => {
+          console.error('Error al actualizar usuario:', error);
+          Swal.fire('Error', 'No se pudo actualizar el usuario', 'error');
         });
-        document.getElementById('prevPage').addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                renderizarTablaUsuarios();
-            }
+    }
+
+    function confirmDeleteUser() {
+      const correo = modalElements.deleteCorreo?.value;
+      if (!correo) return;
+
+      apiClient({ method: 'DELETE', url: `${API_BASE}/eliminar_usuario/${correo}` })
+        .then(({ data }) => {
+          if (data?.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Usuario eliminado',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            closeModal('confirmDeleteModal');
+            loadUsers();
+          } else {
+            Swal.fire('Error', data?.message || 'No fue posible eliminar el usuario', 'error');
+          }
+        })
+        .catch((error) => {
+          console.error('Error eliminando usuario:', error);
+          Swal.fire('Error', 'No se pudo eliminar el usuario', 'error');
         });
-        
-        document.getElementById('nextPage').addEventListener('click', () => {
-            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-            if (currentPage < totalPages) {
-                currentPage++;
-                renderizarTablaUsuarios();
-            }
+    }
+
+    function handleTableActions(event) {
+      const target = event.target.closest('button[data-action]');
+      if (!target) return;
+      const action = target.dataset.action;
+      if (action === 'edit') {
+        openEditModal(target.dataset.correo);
+      } else if (action === 'delete') {
+        openDeleteModal(target.dataset.correo, target.dataset.nombre);
+      }
+    }
+
+    function bindEvents() {
+      if (elements.refreshBtn) {
+        elements.refreshBtn.addEventListener('click', loadUsers);
+      }
+      if (elements.prevPage) {
+        elements.prevPage.addEventListener('click', () => {
+          if (state.currentPage > 1) {
+            state.currentPage -= 1;
+            renderTable();
+          }
         });
-        
-        // Cargar usuarios al iniciar
-        document.addEventListener('DOMContentLoaded', cargarUsuarios);
+      }
+      if (elements.nextPage) {
+        elements.nextPage.addEventListener('click', () => {
+          const totalPages = Math.ceil(state.filtered.length / state.perPage) || 1;
+          if (state.currentPage < totalPages) {
+            state.currentPage += 1;
+            renderTable();
+          }
+        });
+      }
+      if (elements.searchInput) {
+        elements.searchInput.addEventListener('input', (event) => applyFilter(event.target.value));
+      }
+      if (elements.tableBody) {
+        elements.tableBody.addEventListener('click', handleTableActions);
+      }
 
+      // Exponer helpers para los atributos inline existentes
+      window.buscarUsuarios = () => applyFilter(elements.searchInput?.value || '');
+      window.abrirModalEdicion = openEditModal;
+      window.abrirModalEliminacion = openDeleteModal;
+      window.cerrarModal = closeModal;
+      window.guardarCambios = saveUserChanges;
+      window.eliminarUsuarioConfirmado = confirmDeleteUser;
+    }
 
+    function init() {
+      if (!hasUserPage()) return;
+      bindEvents();
+      loadUsers();
+    }
 
+    return { init, reload: loadUsers };
+  })();
 
-        /*usuer y admiin*/ 
-        if (user.rol === "admin") {
-    window.location.href = "principal_admin.html";
-} else {
-    window.location.href = "principal_usuario.html";
-}
+  // ---------------------------
+  //  Inicialización global
+  // ---------------------------
+  document.addEventListener('DOMContentLoaded', () => {
+    applyNavigationState();
+    updateUserHeader();
+    setupPasswordToggle();
+    guardSession();
+    userModule.init();
+  });
 
+  window.validarlogin = validarlogin;
+  window.logout = logout;
+  window.__userModule = userModule;
+})();

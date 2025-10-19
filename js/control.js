@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Obtener primero el rol y el id del usuario
     const userRole = localStorage.getItem('userRole');
     const userId = Number(localStorage.getItem('userId'));
-    console.log('userId usado en la petición:', userId, typeof userId);
 
     // Si es admin, llenar el select de usuarios en el modal
     if (userRole === 'admin') {
