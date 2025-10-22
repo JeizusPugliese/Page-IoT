@@ -1,5 +1,5 @@
 (() => {
-  const API_BASE = 'https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net';
+  const API_BASE = 'http://31.97.148.125:8080/api';
   const STORAGE_KEYS = {
     token: 'token',
     role: 'userRole',
