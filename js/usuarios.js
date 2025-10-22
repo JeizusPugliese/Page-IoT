@@ -1,5 +1,5 @@
 (() => {
-  const API_BASE = 'http://31.97.148.125:8080/api';
+  const API_BASE = 'http://31.97.148.125:8080';
   const STORAGE_KEYS = {
     token: 'token',
     role: 'userRole',
