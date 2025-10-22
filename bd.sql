@@ -1,3 +1,8 @@
+-- Crear base de datos (ejecutar desde la conexión postgres)
+CREATE DATABASE greentech;
+
+\connect softcul
+
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -67,12 +72,15 @@ CREATE TABLE sensores (
   referencia VARCHAR(60) NOT NULL UNIQUE,
   id_tipo_sensor SMALLINT NOT NULL REFERENCES tipo_sensor(id),
   id_usuario INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
-  fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT sensores_usuario_nombre UNIQUE (id_usuario, lower(nombre_sensor))
+  fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE UNIQUE INDEX sensores_usuario_nombre_uk
+  ON sensores (id_usuario, lower(nombre_sensor));
 
 CREATE INDEX sensores_usuario_idx ON sensores (id_usuario);
 CREATE INDEX sensores_tipo_idx ON sensores (id_tipo_sensor);
+
 
 -- =====================
 -- Medidas históricas
@@ -114,5 +122,12 @@ CREATE TABLE sesiones (
 );
 
 CREATE INDEX sesiones_usuario_idx ON sesiones (usuario_id, revocado);
+
+-- Usuarios iniciales
+INSERT INTO usuarios (nombre, apellido, correo, password, celular, id_rol, ultimo_acceso)
+VALUES
+  ('Admin', 'Principal', 'admin@infoiot.com', '1234567', '+57 300 000 0001', 1, now()),
+  ('User', 'Operador', 'user@infoiot.com', '1234567', '+57 300 000 0002', 2, now())
+ON CONFLICT (correo) DO NOTHING;
 
 COMMIT;
