@@ -11,7 +11,7 @@ function mostrarHistorial(sensorId) {
     document.body.appendChild(spinner);
     
     // Realizar la petición a la API
-    fetch(`https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/historial?sensor=${sensorId}`)
+    fetch(`https://api-tmom.onrender.com/historial?sensor=${sensorId}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Error en la respuesta de la red');

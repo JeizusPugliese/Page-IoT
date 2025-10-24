@@ -103,7 +103,7 @@ document.getElementById('formReporte').addEventListener('submit', function(e) {
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
-    axios.post('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/consultar_reportes', {
+    axios.post('https://api-tmom.onrender.com/consultar_reportes', {
         fechaInicio, fechaFin, nombreSensor
     })
     .then(function(response) {
@@ -153,7 +153,7 @@ document.getElementById('consultarTodos').addEventListener('click', function () 
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
-    axios.get('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/sensores_todos')
+    axios.get('https://api-tmom.onrender.com/sensores_todos')
         .then(function (response) {
             Swal.close();
             const datos = response.data;

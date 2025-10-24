@@ -1,5 +1,5 @@
 (() => {
-  const API_BASE = 'https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net';
+  const API_BASE = 'https://api-tmom.onrender.com';
 
   document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('userRole') !== 'admin') return;

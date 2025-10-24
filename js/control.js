@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (userRole === 'admin') {
         const userSelect = document.getElementById('sensorUser');
         if (userSelect) {
-            axios.get('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/obtener_usuarios', {
+            axios.get('https://api-tmom.onrender.com/obtener_usuarios', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             })
             .then(res => {
@@ -228,9 +228,9 @@ document.addEventListener("DOMContentLoaded", () => {
     async function cargarSensores() {
         let url = '';
         if (userRole === 'admin') {
-            url = 'https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/sensores_todos';
+            url = 'https://api-tmom.onrender.com/sensores_todos';
         } else {
-            url = `https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/sensores_usuario/${userId}`;
+            url = `https://api-tmom.onrender.com/sensores_usuario/${userId}`;
         }
         try {
             const res = await axios.get(url, {
@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const sel = document.getElementById('sensorType');
         if (!sel) return;
         try {
-            const res = await axios.get('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/tipo_sensor', {
+            const res = await axios.get('https://api-tmom.onrender.com/tipo_sensor', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
             const tipos = res.data?.data || [];
@@ -308,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
             try {
-                await axios.post('https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/add_sensor', {
+                await axios.post('https://api-tmom.onrender.com/add_sensor', {
                     nombre_sensor: nombre,
                     referencia: referencia,
                     id_tipo_sensor: id_tipo_sensor,
@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             if (confirm.isConfirmed) {
                 try {
-                    await axios.delete(`https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net/eliminar_sensor/${sensorId}`, {
+                    await axios.delete(`https://api-tmom.onrender.com/eliminar_sensor/${sensorId}`, {
                         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                     });
                     Swal.fire('Eliminado', 'Sensor eliminado correctamente', 'success');

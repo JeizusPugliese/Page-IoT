@@ -1,5 +1,5 @@
 (() => {
-  const API_BASE = 'https://apigreentech-e7g6a3e8hbbwdxf8.brazilsouth-01.azurewebsites.net';
+  const API_BASE = 'https://api-tmom.onrender.com';
   const TOKEN_KEY = 'token';
 
   const withAuth = (config) => {
