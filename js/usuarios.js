@@ -13,6 +13,22 @@
   const getUserId = () => localStorage.getItem(STORAGE_KEYS.id);
   const getUserName = () => localStorage.getItem(STORAGE_KEYS.name) || 'Usuario';
 
+  const loginDom = {
+    form: null,
+    emailInput: null,
+    passwordInput: null,
+    toggleBtn: null
+  };
+
+  const cacheLoginDom = () => {
+    if (!isLoginView()) return loginDom;
+    loginDom.form = loginDom.form || document.querySelector('.login-form');
+    loginDom.emailInput = loginDom.emailInput || document.getElementById('txtcorreo');
+    loginDom.passwordInput = loginDom.passwordInput || document.getElementById('txtpassword');
+    loginDom.toggleBtn = loginDom.toggleBtn || document.getElementById('togglePasswordBtn');
+    return loginDom;
+  };
+
   const apiClient = (config) => {
     const token = getToken();
     const headers = { ...(config.headers || {}) };
@@ -20,6 +36,28 @@
       headers.Authorization = `Bearer ${token}`;
     }
     return axios({ ...config, headers });
+  };
+
+  const persistSession = ({ token, rol, id, nombre }) => {
+    if (token) localStorage.setItem(STORAGE_KEYS.token, token);
+    if (rol) localStorage.setItem(STORAGE_KEYS.role, rol);
+    if (id) localStorage.setItem(STORAGE_KEYS.id, id);
+    if (nombre) localStorage.setItem(STORAGE_KEYS.name, nombre);
+  };
+
+  const setLoginLoading = (isLoading) => {
+    const { form } = cacheLoginDom();
+    if (!form) return;
+    const submitButton = form.querySelector('.btn-login');
+    if (!submitButton) return;
+    submitButton.disabled = isLoading;
+    submitButton.classList.toggle('is-loading', isLoading);
+    submitButton.setAttribute('aria-busy', String(isLoading));
+  };
+
+  const goToDashboard = (role) => {
+    const destino = role === 'admin' ? 'principal_admin.html' : 'principal_usuario.html';
+    window.location.href = destino;
   };
 
   const redirectToLogin = () => {
@@ -39,42 +77,45 @@
   //  Autenticación
   // ---------------------------
   function validarlogin() {
-    const correo = document.getElementById('txtcorreo');
-    const password = document.getElementById('txtpassword');
+    const { emailInput, passwordInput } = cacheLoginDom();
 
-    if (!correo || !password) {
+    if (!emailInput || !passwordInput) {
       return;
     }
 
-    const email = correo.value.trim();
-    const pass = password.value.trim();
+    const email = emailInput.value.trim();
+    const pass = passwordInput.value.trim();
 
     if (!email || !pass) {
       Swal.fire('Error', 'Por favor ingresa ambos campos', 'error');
       return;
     }
 
-    axios.post(`${API_BASE}/login`, { correo: email, password: pass })
+    setLoginLoading(true);
+
+    apiClient({ method: 'POST', url: `${API_BASE}/login`, data: { correo: email, password: pass } })
       .then(({ data }) => {
         if (!data?.success) {
           Swal.fire('Error', 'Credenciales incorrectas', 'error');
           return;
         }
 
-        localStorage.setItem(STORAGE_KEYS.token, data.token);
-        localStorage.setItem(STORAGE_KEYS.role, data.rol);
-        localStorage.setItem(STORAGE_KEYS.id, data.id);
-        localStorage.setItem(STORAGE_KEYS.name, data.nombre);
+        persistSession({
+          token: data.token,
+          rol: data.rol,
+          id: data.id,
+          nombre: data.nombre
+        });
 
-        const destino = data.rol === 'admin' ? 'principal_admin.html' : 'principal_usuario.html';
         Swal.fire('Bienvenido', data.nombre, 'success').then(() => {
-          window.location.href = destino;
+          goToDashboard(data.rol);
         });
       })
       .catch((error) => {
         console.error('Error al iniciar sesión:', error);
         Swal.fire('Error', 'No se pudo iniciar sesión. Intenta nuevamente.', 'error');
-      });
+      })
+      .finally(() => setLoginLoading(false));
   }
 
   function logout() {
@@ -148,15 +189,30 @@
     if (role === 'admin') {
       userTabs.forEach((tab) => tab.setAttribute('hidden', 'hidden'));
       adminTabs.forEach((tab) => tab.removeAttribute('hidden'));
-      const active = nav.querySelector('#navReportesAdmin a, #navUsuarios a');
-      if (active) active.classList.add('active');
     } else if (role === 'usuario') {
       adminTabs.forEach((tab) => tab.setAttribute('hidden', 'hidden'));
       userTabs.forEach((tab) => tab.removeAttribute('hidden'));
-      const active = nav.querySelector('#navReportesUser a, #navControlUser a');
-      if (active) active.classList.add('active');
     } else {
       [...adminTabs, ...userTabs].forEach((tab) => tab.setAttribute('hidden', 'hidden'));
+      return;
+    }
+
+    const visibleItems = [...nav.querySelectorAll('li')].filter((item) => !item.hasAttribute('hidden'));
+    const currentPath = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    const activeLink = visibleItems
+      .map((item) => item.querySelector('a'))
+      .find((link) => {
+        if (!link) return false;
+        const href = link.getAttribute('href') || '';
+        const hrefPath = href.split('?')[0].split('#')[0].split('/').pop().toLowerCase();
+        return hrefPath === currentPath;
+      });
+
+    if (activeLink) {
+      activeLink.classList.add('active');
+    } else if (visibleItems.length) {
+      const fallback = visibleItems[0].querySelector('a');
+      if (fallback) fallback.classList.add('active');
     }
   }
 
@@ -183,22 +239,47 @@
   }
 
   function setupPasswordToggle() {
-    const toggleButton = document.getElementById('togglePasswordBtn');
-    const passwordInput = document.getElementById('txtpassword');
-    if (!toggleButton || !passwordInput) return;
+    const { toggleBtn, passwordInput } = cacheLoginDom();
+    if (!toggleBtn || !passwordInput) return;
 
-    toggleButton.addEventListener('click', () => {
+    const icon = toggleBtn.querySelector('i');
+    toggleBtn.setAttribute('aria-pressed', 'false');
+
+    toggleBtn.addEventListener('click', () => {
       const isHidden = passwordInput.type === 'password';
       passwordInput.type = isHidden ? 'text' : 'password';
-      toggleButton.innerHTML = isHidden
-        ? '<i class="far fa-eye-slash"></i>'
-        : '<i class="far fa-eye"></i>';
+      toggleBtn.setAttribute('aria-pressed', String(isHidden));
+      if (icon) {
+        icon.classList.toggle('fa-eye-slash', isHidden);
+        icon.classList.toggle('fa-eye', !isHidden);
+      }
     });
   }
 
   function guardSession() {
     if (!isLoginView()) {
       verifyToken();
+    }
+  }
+
+  function togglePassword(fieldId) {
+    const input = document.getElementById(fieldId);
+    if (!input) return;
+
+    const button = document.querySelector(`.toggle-password-btn[data-toggle="${fieldId}"]`);
+    const icon = button?.querySelector('i');
+    const isHidden = input.type === 'password';
+
+    input.type = isHidden ? 'text' : 'password';
+
+    if (button) {
+      button.setAttribute('aria-pressed', String(isHidden));
+      button.classList.toggle('is-active', isHidden);
+    }
+
+    if (icon) {
+      icon.classList.toggle('fa-eye', !isHidden);
+      icon.classList.toggle('fa-eye-slash', isHidden);
     }
   }
 
@@ -238,6 +319,29 @@
       deleteCorreo: document.getElementById('deleteCorreo'),
       deleteName: document.getElementById('userToDelete')
     };
+
+    const MODAL_HIDE_DELAY = 280;
+
+    function showModal(modal) {
+      if (!modal) return;
+      modal.style.display = 'flex';
+      requestAnimationFrame(() => modal.classList.add('is-visible'));
+    }
+
+    function hideModal(modal) {
+      if (!modal) return;
+      modal.classList.remove('is-visible');
+      const handleTransitionEnd = () => {
+        modal.style.display = 'none';
+        modal.removeEventListener('transitionend', handleTransitionEnd);
+      };
+      modal.addEventListener('transitionend', handleTransitionEnd, { once: true });
+
+      setTimeout(() => {
+        if (modal.classList.contains('is-visible')) return;
+        modal.style.display = 'none';
+      }, MODAL_HIDE_DELAY);
+    }
 
     const hasUserPage = () => Boolean(elements.tableBody);
 
@@ -320,7 +424,11 @@
     function setLoading(isLoading) {
       const loader = document.getElementById('topLoader');
       if (loader) loader.classList.toggle('active', isLoading);
-      if (elements.refreshBtn) elements.refreshBtn.classList.toggle('loading', isLoading);
+      if (elements.refreshBtn) {
+        elements.refreshBtn.classList.toggle('is-loading', isLoading);
+        elements.refreshBtn.disabled = isLoading;
+        elements.refreshBtn.setAttribute('aria-busy', String(isLoading));
+      }
     }
 
     function loadUsers() {
@@ -354,19 +462,35 @@
       modalElements.editCelular.value = user.celular || '';
       modalElements.editRol.value = user.rol;
       modalElements.editPassword.value = '';
-      modalElements.editModal.style.display = 'flex';
+      if (modalElements.editPassword) {
+        modalElements.editPassword.value = '';
+        modalElements.editPassword.type = 'password';
+      }
+
+      const toggleButton = document.querySelector('.toggle-password-btn[data-toggle="editPassword"]');
+      if (toggleButton) {
+        toggleButton.classList.remove('is-active');
+        toggleButton.setAttribute('aria-pressed', 'false');
+        const toggleIcon = toggleButton.querySelector('i');
+        if (toggleIcon) {
+          toggleIcon.classList.add('fa-eye');
+          toggleIcon.classList.remove('fa-eye-slash');
+        }
+      }
+
+      showModal(modalElements.editModal);
     }
 
     function openDeleteModal(correo, nombreCompleto) {
       if (!modalElements.deleteModal) return;
       modalElements.deleteCorreo.value = correo;
       modalElements.deleteName.textContent = nombreCompleto;
-      modalElements.deleteModal.style.display = 'flex';
+      showModal(modalElements.deleteModal);
     }
 
     function closeModal(id) {
       const modal = document.getElementById(id);
-      if (modal) modal.style.display = 'none';
+      if (modal) hideModal(modal);
     }
 
     function saveUserChanges(event) {
@@ -478,6 +602,14 @@
     function init() {
       if (!hasUserPage()) return;
       bindEvents();
+      [modalElements.editModal, modalElements.deleteModal].forEach((modal) => {
+        if (!modal) return;
+        modal.addEventListener('click', (event) => {
+          if (event.target === modal) {
+            hideModal(modal);
+          }
+        });
+      });
       loadUsers();
     }
 
@@ -492,10 +624,14 @@
     updateUserHeader();
     setupPasswordToggle();
     guardSession();
+    document.querySelectorAll('.toggle-password-btn').forEach((btn) => {
+      btn.setAttribute('aria-pressed', 'false');
+    });
     userModule.init();
   });
 
   window.validarlogin = validarlogin;
   window.logout = logout;
   window.__userModule = userModule;
+  window.togglePassword = togglePassword;
 })();
