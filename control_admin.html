@@ -69,7 +69,6 @@
     </header>
     <!-- Contenido principal -->
     <main class="dashboard-content" id="mainContent">
-</section>
         <!-- Encabezado -->
         <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;">
             <h2 class="section-title"><span>Monitoreo en Tiempo Real</span></h2>
@@ -81,30 +80,8 @@
             <i class="fas fa-clock"></i>
             <span id="last-update-text">Última actualización: --:--:--</span>
         </div>
-        <!-- Grid de sensores -->
-        <div class="sensor-grid" id="sensorGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;min-height:200px;">
-            <!-- Aquí se renderizan los sensores del usuario -->
-        </div>
-        <div class="stats-cards" style="display:flex;gap:1rem;justify-content:center;margin:2rem 0;">
-            <div class="stat-card">
-                <i class="fas fa-microchip"></i>
-                <div>
-                    <span class="stat-value" id="totalSensores">0</span>
-                    <span class="stat-label">Sensores registrados</span>
-                </div>
-            </div>
-        </div>
 
-        <!-- Tarjeta de gráfico -->
-        <div class="graph-card" id="graphCard">
-            <div class="graph-card-header">
-                <h4>Gráfico del Sensor</h4>
-                <button class="close-btn" onclick="cerrarGrafico()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="graph-card-body">
-                <iframe id="iframeGrafico" src="" frameborder="0" loading="lazy"></iframe>
-            </div>
-        </div>
+        <div id="sensorGrid" class="sensor-grid" style="display:none;"></div>
 
         <!-- ✅ Modal Agregar Sensor -->
         <div id="addSensorModal" class="modal">
@@ -147,7 +124,14 @@
         </div>
 
         <!-- KPIs -->
-        <section class="status-cards" style="margin-bottom:1rem;">
+        <section class="status-cards" style="margin-bottom:2rem;">
+          <div class="status-card">
+            <div class="status-icon online"><i class="fas fa-microchip"></i></div>
+            <div class="status-info">
+              <span class="status-value" id="totalSensores">0</span>
+              <span class="status-label">Sensores registrados</span>
+            </div>
+          </div>
           <div class="status-card">
             <div class="status-icon normal"><i class="fas fa-users"></i></div>
             <div class="status-info">
@@ -156,24 +140,11 @@
             </div>
           </div>
           <div class="status-card">
-            <div class="status-icon online"><i class="fas fa-microchip"></i></div>
+            <div class="status-icon online"><i class="fas fa-link"></i></div>
             <div class="status-info">
               <span class="status-value" id="totalSensoresUsuario">0</span>
-              <span class="status-label">Sensores (usuario seleccionado)</span>
-            </div>
-          </div>
-          <div class="status-card">
-            <div class="status-icon normal"><i class="fas fa-bolt"></i></div>
-            <div class="status-info">
-              <span class="status-value" id="accionesHoy">0</span>
-              <span class="status-label">Acciones hoy</span>
-            </div>
-          </div>
-          <div class="status-card">
-            <div class="status-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="status-info">
-              <span class="status-value" id="alertasActivas">0</span>
-              <span class="status-label">Alertas activas</span>
+              <span class="status-label">Sensores del usuario</span>
+              <span class="status-helper">Usuario: <strong id="selectedUserLabel">Sin seleccionar</strong></span>
             </div>
           </div>
         </section>
@@ -187,12 +158,12 @@
               <button class="search-btn" id="userSearchBtn"><i class="fas fa-search"></i></button>
             </div>
           </div>
-          <div style="overflow-x:auto;">
-            <table id="usuariosTable" class="usuarios-table" style="width:100%;border-collapse:collapse;">
+          <div class="table-container">
+            <table id="usuariosTable" class="users-table">
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Apellido</th>
+                  <th>Usuario</th>
+                  <th>Rol</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -216,26 +187,30 @@
                 <!-- Aquí se listan los sensores con controles -->
               </div>
               <hr style="margin:2rem 0 1.2rem 0;">
-              <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #4361ee22;padding:1.2rem;">
-                <h4 style="margin-bottom:.8rem;color:#4361ee;">Agregar sensor a este usuario</h4>
-                <form id="adminAddSensorForm" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;">
-                  <div class="form-group" style="flex:1;min-width:180px;">
+              <div class="admin-add-sensor-card">
+                <h4>Agregar sensor a este usuario</h4>
+                <form id="adminAddSensorForm">
+                  <div class="form-group">
                     <label for="adminSensorName">Nombre del sensor</label>
-                    <input id="adminSensorName" type="text" required style="width:100%;" />
+                    <input id="adminSensorName" type="text" required />
                   </div>
-                  <div class="form-group" style="flex:0.5;min-width:160px;">
+                  <div class="form-group">
                     <label for="adminSensorRef">Referencia del sensor</label>
-                    <input id="adminSensorRef" type="text" placeholder="Ej: DHT11_T_01" required style="width:100%;" />
+                    <input id="adminSensorRef" type="text" placeholder="Ej: DHT11_T_01" required />
+                    <span class="hint">Guarda un prefijo por tipo para encontrarlos rápido.</span>
                   </div>
-                  <div class="form-group" style="flex:1;min-width:180px;">
+                  <div class="form-group">
                     <label for="adminSensorTipo">Tipo de sensor</label>
-                    <select id="adminSensorTipo" required style="width:100%;">
+                    <select id="adminSensorTipo" required>
                       <option value="" disabled selected>Seleccione tipo</option>
                       <!-- Opciones dinámicas por JS -->
                     </select>
                   </div>
                   <div>
-                    <button type="submit" class="btn btn-primary" style="padding:.7rem 1.5rem;"><i class="fas fa-plus"></i> Agregar</button>
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-plus"></i>
+                      <span>Agregar</span>
+                    </button>
                   </div>
                 </form>
               </div>

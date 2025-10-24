@@ -15,6 +15,7 @@
       lastUpdate: document.getElementById('last-update-text'),
       totalUsuarios: document.getElementById('totalUsuarios'),
       totalSensoresUsuario: document.getElementById('totalSensoresUsuario'),
+      selectedUserLabel: document.getElementById('selectedUserLabel'),
       searchInput: document.getElementById('userSearch'),
       searchButton: document.getElementById('userSearchBtn'),
       tableBody: document.getElementById('usuariosTableBody'),
@@ -31,7 +32,37 @@
       users: [],
       filteredUsers: [],
       selectedUserId: null,
+      selectedUserName: '',
       refreshInterval: null
+    };
+
+    function updateSelectedUserLabel() {
+      if (!elements.selectedUserLabel) return;
+      elements.selectedUserLabel.textContent = state.selectedUserName || 'Sin seleccionar';
+    }
+
+    function resetSensorView(message) {
+      if (elements.totalSensoresUsuario) elements.totalSensoresUsuario.textContent = '0';
+      if (elements.sensorList) {
+        elements.sensorList.innerHTML = `<div style="text-align:center;color:#888;">${message || 'Selecciona un usuario para visualizar sus sensores.'}</div>`;
+      }
+    }
+
+    const showModal = (modal) => {
+      if (!modal) return;
+      modal.style.display = 'flex';
+      requestAnimationFrame(() => modal.classList.add('is-visible'));
+    };
+
+    const hideModal = (modal) => {
+      if (!modal) return;
+      modal.classList.remove('is-visible');
+      const finishHide = () => {
+        modal.style.display = 'none';
+        modal.removeEventListener('transitionend', finishHide);
+      };
+      modal.addEventListener('transitionend', finishHide, { once: true });
+      setTimeout(finishHide, 280);
     };
 
     const setLoading = (isLoading) => {
@@ -59,10 +90,33 @@
 
       state.filteredUsers.forEach((user) => {
         const row = document.createElement('tr');
+        row.dataset.userId = user.id;
+        if (user.id === state.selectedUserId) {
+          row.classList.add('is-selected');
+        }
+
+        const nombreCompleto = `${user.nombre} ${user.apellido || ''}`.trim();
+        const rolId = Number(user.rol);
+        const rolTexto = rolId === 1 ? 'Administrador' : 'Usuario estándar';
+        const rolClase = rolId === 1 ? 'admin' : 'user';
+
         row.innerHTML = `
-          <td>${user.nombre}</td>
-          <td>${user.apellido || ''}</td>
-          <td><button class="admin-btn" data-action="manage" data-user-id="${user.id}">Administrar</button></td>
+          <td>
+            <div class="user-avatar">
+              <i class="fas fa-user-circle"></i>
+              <div>
+                <span>${nombreCompleto || user.nombre}</span>
+                <span class="user-mail">${user.correo}</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="badge ${rolClase}">${rolTexto}</span></td>
+          <td>
+            <button class="admin-btn" data-action="manage" data-user-id="${user.id}">
+              <i class="fas fa-sliders-h"></i>
+              <span>Administrar</span>
+            </button>
+          </td>
         `;
         elements.tableBody.appendChild(row);
       });
@@ -84,22 +138,47 @@
           return fullName.includes(value) || user.correo.toLowerCase().includes(value);
         });
       }
+      if (state.selectedUserId && !state.filteredUsers.some((user) => user.id === state.selectedUserId)) {
+        state.selectedUserId = null;
+        state.selectedUserName = '';
+        updateSelectedUserLabel();
+        resetSensorView();
+      }
       renderUsers();
       updateUserStats();
     };
 
     const closeModal = () => {
-      state.selectedUserId = null;
       if (elements.modal) {
-        elements.modal.style.display = 'none';
+        hideModal(elements.modal);
       }
       if (elements.addForm) {
         elements.addForm.reset();
       }
-      if (state.refreshInterval) {
-        clearInterval(state.refreshInterval);
-        state.refreshInterval = null;
-      }
+    };
+
+    const renderSensorsSkeleton = () => {
+      if (!elements.sensorList) return;
+      const skeletonCard = () => `
+        <div class="skeleton-card">
+          <div class="skeleton-col">
+            <span class="skeleton-bar wide"></span>
+            <span class="skeleton-bar mid"></span>
+            <span class="skeleton-bar short"></span>
+          </div>
+          <div class="skeleton-col" style="width:35%;align-items:flex-end;">
+            <span class="skeleton-bar mid"></span>
+            <span class="skeleton-bar tiny"></span>
+            <span class="skeleton-bar short"></span>
+          </div>
+          <div class="skeleton-actions">
+            <span class="skeleton-chip"></span>
+            <span class="skeleton-chip"></span>
+            <span class="skeleton-chip"></span>
+          </div>
+        </div>
+      `;
+      elements.sensorList.innerHTML = `<div class="skeleton-wrapper">${[skeletonCard(), skeletonCard(), skeletonCard()].join('')}</div>`;
     };
 
     const renderSensors = (sensors) => {
@@ -107,7 +186,10 @@
       elements.sensorList.innerHTML = '';
 
       if (!Array.isArray(sensors) || sensors.length === 0) {
-        elements.sensorList.innerHTML = '<div style="text-align:center;color:#888;">Este usuario no tiene sensores registrados.</div>';
+        const message = state.selectedUserName
+          ? `${state.selectedUserName} aún no tiene sensores registrados.`
+          : 'Selecciona un usuario para visualizar sus sensores.';
+        elements.sensorList.innerHTML = `<div style="text-align:center;color:#888;">${message}</div>`;
         return;
       }
 
@@ -138,8 +220,30 @@
       });
     };
 
+    function selectUser(user) {
+      if (!user) {
+        state.selectedUserId = null;
+        state.selectedUserName = '';
+        updateSelectedUserLabel();
+        resetSensorView();
+        renderUsers();
+        return;
+      }
+
+      state.selectedUserId = user.id;
+      const nombreCompleto = `${user.nombre} ${user.apellido || ''}`.trim();
+      state.selectedUserName = nombreCompleto || user.nombre;
+      updateSelectedUserLabel();
+      if (elements.totalSensoresUsuario) {
+        elements.totalSensoresUsuario.textContent = '—';
+      }
+      renderUsers();
+      fetchSensorsForUser(user.id);
+    }
+
     const fetchSensorsForUser = async (userId) => {
       if (!userId) return;
+      renderSensorsSkeleton();
       try {
         const { data } = await axios.get(`${API_BASE}/sensores_usuario/${userId}`, { headers: authHeaders });
         const sensors = Array.isArray(data) ? data : [];
@@ -155,16 +259,16 @@
     };
 
     const openModalForUser = (user) => {
-      state.selectedUserId = user.id;
+      if (!user) return;
+      if (state.selectedUserId !== user.id) {
+        selectUser(user);
+      }
       if (elements.modalTitle) {
         elements.modalTitle.textContent = `${user.nombre} ${user.apellido || ''}`.trim();
       }
       if (elements.modal) {
-        elements.modal.style.display = 'flex';
+        showModal(elements.modal);
       }
-      fetchSensorsForUser(user.id);
-      if (state.refreshInterval) clearInterval(state.refreshInterval);
-      state.refreshInterval = setInterval(() => fetchSensorsForUser(user.id), 10000);
     };
 
     const loadUsers = async () => {
@@ -174,6 +278,23 @@
         const users = data?.usuarios || [];
         state.users = users.filter((user) => Number(user.rol) !== 1);
         filterUsers(elements.searchInput ? elements.searchInput.value : '');
+        if (state.filteredUsers.length > 0) {
+          if (state.selectedUserId) {
+            const stillExists = state.users.find((user) => user.id === state.selectedUserId);
+            if (stillExists) {
+              selectUser(stillExists);
+            } else {
+              selectUser(state.filteredUsers[0]);
+            }
+          } else {
+            selectUser(state.filteredUsers[0]);
+          }
+        } else {
+          state.selectedUserId = null;
+          state.selectedUserName = '';
+          updateSelectedUserLabel();
+          resetSensorView();
+        }
         if (elements.lastUpdate) {
           elements.lastUpdate.textContent = `Última actualización: ${new Date().toLocaleTimeString()}`;
         }
@@ -183,6 +304,10 @@
           elements.tableBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:red;">No fue posible cargar los usuarios.</td></tr>';
         }
         if (elements.totalUsuarios) elements.totalUsuarios.textContent = '0';
+        state.selectedUserId = null;
+        state.selectedUserName = '';
+        updateSelectedUserLabel();
+        resetSensorView('No se pudieron cargar los sensores.');
       } finally {
         setLoading(false);
       }
@@ -208,11 +333,23 @@
 
     const handleTableClick = (event) => {
       const button = event.target.closest('button[data-action="manage"]');
-      if (!button) return;
-      const userId = Number(button.dataset.userId);
+      if (button) {
+        event.stopPropagation();
+        const userId = Number(button.dataset.userId);
+        const user = state.users.find((item) => item.id === userId);
+        if (user) {
+          selectUser(user);
+          openModalForUser(user);
+        }
+        return;
+      }
+
+      const row = event.target.closest('tr[data-user-id]');
+      if (!row) return;
+      const userId = Number(row.dataset.userId);
       const user = state.users.find((item) => item.id === userId);
       if (user) {
-        openModalForUser(user);
+        selectUser(user);
       }
     };
 
@@ -292,6 +429,7 @@
     if (elements.refreshButton) {
       elements.refreshButton.addEventListener('click', () => {
         if (state.selectedUserId) {
+          renderSensorsSkeleton();
           fetchSensorsForUser(state.selectedUserId);
         } else {
           loadUsers();
@@ -332,6 +470,8 @@
 
     window.cerrarAdminUsuarioModal = closeModal;
 
+    updateSelectedUserLabel();
+    resetSensorView();
     loadUsers();
     populateSensorTypes();
   });

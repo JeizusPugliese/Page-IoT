@@ -338,23 +338,27 @@ def actualizar_usuario():
     nombre = data.get('nombre')
     apellido = data.get('apellido')
     correo = data.get('correo')
-    password = data.get('password')
+    password = (data.get('password') or '').strip()
     celular = data.get('celular')
-    
+
     if not all([nombre, apellido, correo, celular]):
         return jsonify({"success": False, "message": "Todos los campos son requeridos"}), 400
-    
+
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        query = """
-            UPDATE usuarios 
-            SET nombre = %s, apellido = %s, password = %s, celular = %s
-            WHERE correo = %s
-        """
-        cursor.execute(query, (nombre, apellido, password, celular, correo))
+        updates = ["nombre = %s", "apellido = %s", "celular = %s"]
+        params = [nombre, apellido, celular]
+
+        if password:
+            updates.append("password = %s")
+            params.append(password)
+
+        query = f"UPDATE usuarios SET {', '.join(updates)} WHERE correo = %s"
+        params.append(correo)
+        cursor.execute(query, tuple(params))
         conn.commit()
-        
+
         if cursor.rowcount == 0:
             cursor.close()
             conn.close()

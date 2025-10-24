@@ -317,7 +317,9 @@
       editRol: document.getElementById('editRol'),
       editPassword: document.getElementById('editPassword'),
       deleteCorreo: document.getElementById('deleteCorreo'),
-      deleteName: document.getElementById('userToDelete')
+      deleteName: document.getElementById('userToDelete'),
+      saveButton: document.querySelector('#editUserModal .btn.btn-primary'),
+      feedback: document.getElementById('editUserFeedback')
     };
 
     const MODAL_HIDE_DELAY = 280;
@@ -341,6 +343,27 @@
         if (modal.classList.contains('is-visible')) return;
         modal.style.display = 'none';
       }, MODAL_HIDE_DELAY);
+    }
+
+    function setSaving(isSaving) {
+      if (!modalElements.saveButton) return;
+      modalElements.saveButton.disabled = Boolean(isSaving);
+      modalElements.saveButton.classList.toggle('is-loading', Boolean(isSaving));
+      modalElements.saveButton.setAttribute('aria-busy', String(Boolean(isSaving)));
+    }
+
+    function showEditFeedback(type, message) {
+      if (!modalElements.feedback) return;
+      if (!type || !message) {
+        modalElements.feedback.hidden = true;
+        modalElements.feedback.textContent = '';
+        modalElements.feedback.classList.remove('success', 'error');
+        return;
+      }
+      modalElements.feedback.textContent = message;
+      modalElements.feedback.classList.toggle('success', type === 'success');
+      modalElements.feedback.classList.toggle('error', type === 'error');
+      modalElements.feedback.hidden = false;
     }
 
     const hasUserPage = () => Boolean(elements.tableBody);
@@ -478,6 +501,9 @@
         }
       }
 
+      showEditFeedback(null);
+      setSaving(false);
+
       showModal(modalElements.editModal);
     }
 
@@ -491,6 +517,8 @@
     function closeModal(id) {
       const modal = document.getElementById(id);
       if (modal) hideModal(modal);
+      showEditFeedback(null);
+      setSaving(false);
     }
 
     function saveUserChanges(event) {
@@ -510,20 +538,24 @@
         return;
       }
 
+      showEditFeedback(null);
+      setSaving(true);
+
       apiClient({ method: 'PUT', url: `${API_BASE}/actualizar_usuario`, data: payload })
         .then(({ data }) => {
           if (data?.success) {
-            Swal.fire('Actualizado', 'Los datos del usuario se guardaron correctamente', 'success');
-            closeModal('editUserModal');
+            showEditFeedback('success', 'Datos del usuario actualizados.');
             loadUsers();
+            setTimeout(() => showEditFeedback(null), 2200);
           } else {
-            Swal.fire('Error', data?.message || 'No fue posible actualizar el usuario', 'error');
+            showEditFeedback('error', data?.message || 'No fue posible actualizar el usuario');
           }
         })
         .catch((error) => {
           console.error('Error al actualizar usuario:', error);
-          Swal.fire('Error', 'No se pudo actualizar el usuario', 'error');
-        });
+          showEditFeedback('error', 'No se pudo actualizar el usuario');
+        })
+        .finally(() => setSaving(false));
     }
 
     function confirmDeleteUser() {
