@@ -1,0 +1,125 @@
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos de navegación mejorados */
+.landing-header .main-nav a {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.landing-header .main-nav a:hover,
+.landing-header .main-nav a.active {
+  background: rgba(43, 108, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(43, 108, 255, 0.12);
+}
+
+/* Cards con animaciones */
+.hero-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(23, 32, 64, 0.18);
+}
+
+.info-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(23, 32, 64, 0.12);
+}
+
+.info-card:hover i {
+  transform: scale(1.1);
+  color: var(--primary-strong);
+}
+
+.stack-card {
+  transition: all 0.3s ease;
+}
+
+.stack-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(23, 32, 64, 0.12);
+}
+
+.stack-card img {
+  transition: transform 0.3s ease;
+}
+
+.stack-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Botones mejorados */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px rgba(77, 171, 247, 0.35);
+}
+
+/* WhatsApp FAB mejorado */
+#whatsappFab {
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+#whatsappFab:hover {
+  transform: scale(1.1) rotate(10deg);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.5);
+}
+
+/* Mejoras responsivas */
+@media (max-width: 768px) {
+  .landing-hero {
+    text-align: center;
+  }
+  
+  .hero-actions {
+    justify-content: center;
+  }
+  
+  .hero-metrics {
+    justify-content: center;
+  }
+  
+  .info-card, .stack-card {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+/* Animaciones de entrada */
+.hero-copy, .hero-card, .info-card, .stack-card {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.info-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.info-card:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.info-card:nth-child(4) {
+  animation-delay: 0.6s;
+}

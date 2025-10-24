@@ -296,6 +296,14 @@
   box-shadow: 0 12px 40px rgba(3, 9, 28, 0.45);
 }
 
+.support-logos {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .support-logo {
   height: 56px;
   width: auto;

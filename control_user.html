@@ -43,72 +43,52 @@
 
     <!-- Contenido principal -->
     <main class="dashboard-content" id="mainContent">
-        <!-- Mensaje de bienvenida y guía rápida -->
-        <section class="welcome-section" style="text-align:center;margin-bottom:2rem;">
-            <h2>¡Bienvenido a tu Panel de Control de Sensores!</h2>
-            <p>Desde aquí puedes agregar, monitorear y eliminar tus sensores IoT de forma sencilla.<br>
-            Haz clic en <b>Agregar sensor</b> para comenzar o usa el botón <b>Actualizar</b> para ver tus sensores.</p>
-        </section>
-        <!-- Encabezado -->
-        <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;">
-            <h2 class="section-title"><span>Monitoreo en Tiempo Real</span></h2>
-            <div class="section-buttons">
-                <button class="refresh-btn" id="refresh-btn"><i class="fas fa-sync-alt"></i> Actualizar</button>
-            </div>
-        </div>
-        <div class="last-update" style="text-align:right;margin-bottom:1rem;">
-            <i class="fas fa-clock"></i>
-            <span id="last-update-text">Última actualización: --:--:--</span>
-        </div>
-        <!-- Grid de sensores -->
-        <div class="sensor-grid" id="sensorGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;min-height:200px;">
-            <!-- Aquí se renderizan los sensores del usuario -->
-        </div>
-        <!-- Modal tipo weather-app para datos del sensor -->
-        <div id="sensorDataModal" class="weather-modal" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.45);justify-content:center;align-items:center;">
-            <div class="weather-modal-content" style="background:#1e3556 url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80') center/cover no-repeat;border-radius:18px;box-shadow:0 8px 32px rgba(30,53,86,0.25);padding:2.5rem 2.5rem 2rem 2.5rem;min-width:320px;max-width:420px;width:90vw;position:relative;color:#fff;text-align:center;">
-                <button id="closeSensorDataModal" style="position:absolute;top:1.2rem;right:1.2rem;background:rgba(0,0,0,0.18);border:none;border-radius:50%;width:2.2rem;height:2.2rem;color:#fff;font-size:1.3rem;cursor:pointer;"><i class="fas fa-times"></i></button>
-                <div id="sensorDataModalContent">
-                    <!-- Aquí se inyecta el contenido dinámico del sensor -->
-                </div>
-            </div>
-        </div>
-        <div class="stats-cards" style="display:flex;gap:1rem;justify-content:center;margin:2rem 0;">
-            <div class="stat-card">
-                <i class="fas fa-microchip"></i>
-                <div>
-                    <span class="stat-value" id="totalSensores">0</span>
-                    <span class="stat-label-rep">Sensores registrados</span>
-                </div>
-            </div>
-        </div>
+      <section class="welcome-section">
+        <h2>¡Bienvenido a tu Panel de Control de Sensores!</h2>
+        <p>Monitorea el estado de tus dispositivos IoT, revisa lecturas recientes y gestiona cada sensor desde un solo lugar.</p>
+      </section>
 
-        <!-- Tarjeta de gráfico -->
-        <div class="graph-card" id="graphCard">
-            <div class="graph-card-header">
-                <h4>Gráfico del Sensor</h4>
-                <button class="close-btn" onclick="cerrarGrafico()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="graph-card-body">
-                <iframe id="iframeGrafico" src="" frameborder="0" loading="lazy"></iframe>
-            </div>
+      <section class="section-header">
+        <h2 class="section-title"><span>Monitoreo en Tiempo Real</span></h2>
+        <div class="section-buttons">
+          <button class="refresh-btn" id="refresh-btn" aria-label="Actualizar sensores"><i class="fas fa-sync-alt"></i> Actualizar</button>
         </div>
+      </section>
+
+      <div class="last-update">
+        <i class="fas fa-clock" aria-hidden="true"></i>
+        <span>Última actualización: <span id="last-update-text">--:--:--</span></span>
+      </div>
+
+      <section class="status-cards">
+        <div class="status-card">
+          <div class="status-icon online"><i class="fas fa-microchip"></i></div>
+          <div class="status-info">
+            <span class="status-value" id="totalSensores">0</span>
+            <span class="status-label">Sensores registrados</span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div id="sensorGrid" class="sensor-grid is-empty"></div>
+      </section>
     </main>
 
-    <!-- Modal de Historial -->
-    <div class="modal" id="historialModal">
-        <!-- tu modal original -->
+    <div id="sensorDataModal" class="sensor-detail-modal" aria-hidden="true">
+      <div class="sensor-detail-card">
+        <button id="closeSensorDataModal" class="sensor-detail-close" aria-label="Cerrar detalle"><i class="fas fa-times"></i></button>
+        <div id="sensorDataModalContent"></div>
+      </div>
     </div>
 
-    <!-- Chatbot -->
-    <div class="chatbot-container">
-        <!-- tu chatbot original -->
-    </div>
+    <a id="whatsappFab" href="https://wa.me/573052566649?text=Hola%20necesito%20soporte" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.16/dist/sweetalert2.all.min.js"></script>
     <script src="js/tipo_sensor.js"></script>
-    <script src="js/chat.js"></script>
     <script src="js/usuarios.js"></script>
     <script src="js/scripts.js"></script>
     <script src="js/control.js"></script>

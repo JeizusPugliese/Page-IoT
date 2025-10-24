@@ -1,17 +1,17 @@
 /* ===== VARIABLES DE COLOR ===== */
 :root {
   --primary: #4dabf7;
-  --primary-strong: #1f8ceb;
-  --secondary: #1e1e2f;
+    --primary-strong: #1971c2;
+    --secondary: #1c1d2b;
   --bg: #f4f6fb;
   --text: #2b2f3b;
   --text-muted: #6b7285;
   --surface: #ffffff;
   --surface-alt: #f1f4fb;
   --card-bg: #ffffff;
-  --radius: 16px;
+    --radius: 20px;
   --radius-sm: 12px;
-  --shadow: 0 20px 45px rgba(23, 32, 64, 0.12);
+    --shadow: 0 20px 45px rgba(23, 32, 64, 0.15);
   --shadow-soft: 0 12px 30px rgba(23, 32, 64, 0.08);
   --online: #51cf66;
   --warning: #f9c74f;
@@ -56,6 +56,276 @@ body.dashboard {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.landing {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-main {
+  width: min(1200px, 100% - clamp(2rem, 6vw, 4rem));
+  margin: clamp(2rem, 6vw, 3.5rem) auto clamp(3rem, 8vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 6vw, 3.5rem);
+}
+
+.landing-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.landing-header .main-nav ul {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.landing-header .main-nav a {
+  color: var(--text);
+}
+
+.landing-header .main-nav a:hover,
+.landing-header .main-nav a.active {
+  background: rgba(43, 108, 255, 0.12);
+  color: var(--brand);
+  box-shadow: none;
+}
+
+.landing-header .landing-cta .btn-primary {
+  background: linear-gradient(120deg, var(--brand), var(--brand-dark));
+  color: #ffffff;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  font-weight: 600;
+  box-shadow: 0 12px 22px rgba(43, 108, 255, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25);
+}
+
+.landing-hero {
+  display: grid;
+  gap: clamp(1.5rem, 5vw, 3rem);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: center;
+}
+
+.hero-copy .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.hero-copy h2 {
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  margin: 0.6rem 0 0.9rem;
+}
+
+.hero-copy p {
+  color: var(--muted);
+  max-width: 38rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-top: 1.4rem;
+}
+
+.btn-ghost {
+  border: 1px solid rgba(43, 108, 255, 0.35);
+  color: var(--brand);
+  background: rgba(43, 108, 255, 0.08);
+  border-radius: 999px;
+  padding: 0.6rem 1.4rem;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.hero-metrics dt {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--brand);
+}
+
+.hero-metrics dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.hero-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-card {
+  background: var(--card);
+  border-radius: calc(var(--radius) + 8px);
+  box-shadow: var(--shadow);
+  padding: 1.2rem;
+}
+
+.hero-card img {
+  width: min(480px, 100%);
+  border-radius: calc(var(--radius) - 4px);
+  display: block;
+}
+
+.landing-section {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.3rem, 4vw, 2.2rem);
+}
+
+.landing-section.highlight {
+  background: linear-gradient(135deg, rgba(43, 108, 255, 0.08), rgba(43, 108, 255, 0));
+  padding: clamp(2rem, 6vw, 3rem);
+  border-radius: calc(var(--radius) + 4px);
+}
+
+.section-heading {
+  text-align: center;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.section-heading h3 {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+}
+
+.section-heading p {
+  color: var(--muted);
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+.cards-grid {
+  display: grid;
+  gap: clamp(1.2rem, 4vw, 1.8rem);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.info-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.info-card i {
+  font-size: 1.5rem;
+  color: var(--brand);
+}
+
+.stack-showcase {
+  display: grid;
+  gap: clamp(1.2rem, 4vw, 2rem);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.stack-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: clamp(1.4rem, 4vw, 2rem);
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+}
+
+.stack-card img {
+  width: min(160px, 65%);
+  object-fit: contain;
+}
+
+.stack-card h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.stack-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.highlight-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: flex-start;
+}
+
+.landing-footer {
+  background: var(--card);
+  box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.04);
+  margin-top: auto;
+  display: grid;
+  gap: clamp(1.2rem, 4vw, 2rem);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  padding: clamp(1.8rem, 4vw, 2.5rem) clamp(2rem, 6vw, 3.5rem);
+}
+
+.landing-footer a {
+  color: var(--muted);
+}
+
+.landing-footer h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.35rem;
+}
+
+.landing-footer p {
+  color: var(--muted);
+  margin: 0.15rem 0;
+}
+
+.dashboard-content {
+  width: min(1200px, 100% - clamp(2rem, 5vw, 3.5rem));
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.75rem) 0 clamp(3rem, 6vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.6rem, 4vw, 2.8rem);
+}
+
+.welcome-section {
+  text-align: center;
+  background: linear-gradient(145deg, rgba(43, 108, 255, 0.08), rgba(43, 108, 255, 0));
+  border-radius: var(--radius);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: 0 18px 35px rgba(31, 74, 144, 0.08);
+}
+
+.welcome-section h2 {
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  margin-bottom: 0.6rem;
+  color: var(--text);
+}
+
+.welcome-section p {
+  color: var(--muted);
+  max-width: 48rem;
+  margin: 0 auto;
 }
 
 /* ===== HEADER ===== */
@@ -307,6 +577,356 @@ body.dashboard {
   transform: translateY(-8px);
 }
 
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: clamp(1.2rem, 3vw, 1.8rem);
+  width: 100%;
+}
+
+.sensor-grid.is-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sensor-empty-state {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: clamp(2rem, 5vw, 2.8rem);
+  box-shadow: var(--shadow-soft);
+  max-width: 520px;
+  text-align: center;
+  color: var(--muted);
+  display: grid;
+  gap: 0.85rem;
+  justify-items: center;
+}
+
+.sensor-empty-state i {
+  font-size: 2rem;
+  color: var(--brand);
+}
+
+.sensor-empty-state .btn-primary {
+  margin-top: 0.6rem;
+}
+
+.sensor-card-modern {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 1.3rem;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  border: 1px solid transparent;
+}
+
+.sensor-card-modern:is(:hover, :focus-within) {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 32px rgba(21, 45, 110, 0.12);
+}
+
+.sensor-card-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(43, 108, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand);
+}
+
+.sensor-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  padding-right: 3.2rem;
+}
+
+.sensor-card-type {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.sensor-value,
+.sensor-valor {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.sensor-valor .valor-unidad {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-left: 0.35rem;
+  color: var(--muted);
+}
+
+.sensor-card-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem 1.1rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.sensor-card-meta span {
+  display: block;
+}
+
+.sensor-card-meta strong {
+  display: block;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sensor-status {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+  font-weight: 600;
+}
+
+.sensor-status.online {
+  color: var(--success);
+}
+
+.sensor-status.offline {
+  color: var(--muted);
+}
+
+.sensor-status .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sensor-status .tiempo-encendido {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.sensor-card-footnotes {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.sensor-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.sensor-actions .btn-action {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sensor-actions .btn-action.primary {
+  background: rgba(43, 108, 255, 0.15);
+  color: var(--brand);
+  box-shadow: inset 0 0 0 1px rgba(43, 108, 255, 0.25);
+}
+
+.sensor-actions .btn-action.primary:hover {
+  transform: translateY(-1px);
+  background: rgba(43, 108, 255, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(43, 108, 255, 0.35);
+}
+
+.sensor-actions .btn-action.danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger);
+}
+
+.sensor-detail-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 2100;
+}
+
+.sensor-detail-modal.is-visible {
+  display: flex;
+}
+
+.sensor-detail-card {
+  position: relative;
+  width: min(420px, 90vw);
+  border-radius: 28px;
+  overflow: hidden;
+  color: #fff;
+  padding: clamp(1.8rem, 5vw, 2.5rem);
+  background: linear-gradient(160deg, rgba(12, 19, 38, 0.75), rgba(33, 53, 120, 0.55)),
+    url('../img/tree.jpg') center/cover no-repeat;
+  box-shadow: 0 26px 60px rgba(10, 18, 40, 0.45);
+}
+
+.sensor-detail-card[data-type="temperatura"] {
+  background-image: linear-gradient(160deg, rgba(12, 19, 38, 0.75), rgba(33, 53, 120, 0.55)), url('../img/dht11 sensor.jpeg');
+}
+
+.sensor-detail-card[data-type="humedad"] {
+  background-image: linear-gradient(160deg, rgba(12, 30, 45, 0.75), rgba(27, 73, 110, 0.55)), url('../img/nubes.jpg');
+}
+
+.sensor-detail-card[data-type="movimiento"],
+.sensor-detail-card[data-type="gas"],
+.sensor-detail-card[data-type="luz"],
+.sensor-detail-card[data-type="generico"] {
+  background-image: linear-gradient(160deg, rgba(12, 19, 38, 0.75), rgba(33, 53, 120, 0.55)), url('../img/sensor-pir.jpg');
+}
+
+.sensor-detail-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 17, 34, 0.4), rgba(10, 17, 34, 0.75));
+  pointer-events: none;
+}
+
+.sensor-detail-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.sensor-detail-card h3 {
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  margin-bottom: 0.45rem;
+}
+
+.sensor-detail-card .sensor-detail-value {
+  font-size: clamp(2.6rem, 8vw, 3.5rem);
+  font-weight: 700;
+  margin: 0.4rem 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.sensor-detail-card .sensor-detail-meta {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sensor-detail-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.6rem;
+}
+
+.sensor-detail-state {
+  font-style: italic;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+
+.sensor-detail-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.45);
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#whatsappFab {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18px 28px rgba(37, 211, 102, 0.32);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  z-index: 2000;
+}
+
+#whatsappFab:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 26px 38px rgba(37, 211, 102, 0.35);
+}
+
+#whatsappFab i {
+  font-size: 1.35rem;
+}
+
+@media (max-width: 480px) {
+  #whatsappFab {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* Overrides para tarjetas modernas */
+.sensor-card-modern .sensor-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.45rem;
+}
+
+.sensor-card-modern .sensor-status .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.sensor-card-modern .sensor-valor {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.sensor-card-modern .sensor-valor .valor-num {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.sensor-card-modern .sensor-valor .valor-unidad {
+  font-size: 1rem;
+  color: var(--muted);
+}
+
 .sensor-icon i {
   font-size: 2rem;
   color: var(--primary);
@@ -479,13 +1099,26 @@ body.dashboard {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .section-title {
-  font-size: 1.8rem;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--text);
+  position: relative;
+}
+.section-title span::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.35rem;
+  width: 48px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand), transparent);
 }
 .section-buttons {
   display: flex;
@@ -754,7 +1387,7 @@ body.dashboard {
 
 .btn-primary {
   background: var(--primary);
-  color: white;
+  color: rgb(255, 255, 255);
 }
 
 .btn-primary:hover {
