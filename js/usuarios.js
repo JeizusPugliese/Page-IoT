@@ -530,8 +530,12 @@
         apellido: modalElements.editApellido.value.trim(),
         correo: modalElements.editCorreo.value.trim(),
         celular: modalElements.editCelular.value.trim(),
-        password: modalElements.editPassword.value.trim() || undefined
+        password: modalElements.editPassword.value.trim()
       };
+
+      if (!payload.password) {
+        delete payload.password;
+      }
 
       if (!payload.nombre || !payload.apellido || !payload.correo || !payload.celular) {
         Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
